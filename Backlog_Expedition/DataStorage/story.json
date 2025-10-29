@@ -1,0 +1,65 @@
+{
+  "login": [
+    "You find a mysterious signpost on the shore of the island that says:", 
+    "'Please type in your archipelago room data'"
+  ],
+  "introduction": [
+    "Logmundr Backson arrives at this strange island with only one goal in mind....", 
+    "Collect Treasure and raid this entire place!"
+  ],
+  "goal": [
+    "Place goal description here."
+  ],
+  "treasure_descriptions": {
+    "Archipelago Map": [
+      "Logmundr's eyes shine as he looks upon this map.", 
+      "Not a treasure in value, no, but now he knows where to find more treasure!"
+    ],
+    "Desert Talisman": [
+      "Logmundr's eyes shine as he looks upon this map.", 
+      "Not a treasure in value, no, but now he knows where to find more treasure!"
+    ],
+    "Tropical Amulet": [
+      "Logmundr's eyes shine as he looks upon this map.", 
+      "Not a treasure in value, no, but now he knows where to find more treasure!"
+    ],
+    "Fire Ring": [
+      "Logmundr's eyes shine as he looks upon this map.", 
+      "Not a treasure in value, no, but now he knows where to find more treasure!"
+    ],
+    "Ice Shard": [
+      "Logmundr's eyes shine as he looks upon this map.", 
+      "Not a treasure in value, no, but now he knows where to find more treasure!"
+    ],
+    "Gemstone Crown": [
+      "Logmundr's eyes shine as he looks upon this map.", 
+      "Not a treasure in value, no, but now he knows where to find more treasure!"
+    ],
+    "Climbing Gloves": [
+      "Logmundr's eyes shine as he looks upon this map.", 
+      "Not a treasure in value, no, but now he knows where to find more treasure!"
+    ],
+    "Cherry Wand": [
+      "Logmundr's eyes shine as he looks upon this map.", 
+      "Not a treasure in value, no, but now he knows where to find more treasure!",
+      "More lines as needed",
+      "As many as you like"
+    ],
+    "Swamp Waders": [""],
+    "Jungle Staff": [""],
+    "Pinecone Helmet": [""],
+    "Orchard Sickle": [""],
+    "Plains Greaves": [""],
+    "Glacier Diadem": [""],
+    "Tar Bracelet": [""],
+    "Candycane": [""],
+    "Christmas Present": [""],
+    "Another Man's Treasure": [""],
+    "Forgotten Mask": [""],
+    "Giant Toadstool": [""],
+    "Miniature Mech": [""],
+    "Moon Rocks": [""],
+    "Golden Meeple": [""],
+    "The Missing Piece": [""]
+  }
+}
