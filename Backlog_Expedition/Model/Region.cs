@@ -9,6 +9,7 @@
         public bool RuneReceived => Name == "Starting" || GameHandler.ItemHandler.AvailableRunes.Exists(n => n == RuneName);
         public bool TreasureFound => 0 == Locations.Where(l => l.Entity == "monster").ToList().Count;
         public string RuneAsciiFileName => $"rune_{Name.ToUpper()}".Replace(" ", "");
+        public string RuneAsciiFileNameWText => $"{RuneAsciiFileName}_name";
         public string TreasureAsciiFileName => $"mcguffins_{TreasureName.ToUpper().Replace("'", "").Replace(" ", "")}";
         public void CheckLocation(Location location)
         {

@@ -71,7 +71,7 @@ namespace Backlog_Expedition
 
             Console.Clear();
 
-            List<string> runeFileNames = [.. availableRegions.Where(r => r.Name != "Starting").Select(r => r.RuneAsciiFileName)];
+            List<string> runeFileNames = [.. availableRegions.Where(r => r.Name != "Starting").Select(r => r.RuneAsciiFileNameWText)];
 
             if (runeFileNames.Count == 0)
             {
@@ -83,14 +83,6 @@ namespace Backlog_Expedition
             else
             {
                 List<string[]> Arts = LoadMultipleArtFiles(runeFileNames);
-                List<string[]> Names = [];
-
-                foreach (Region region in availableRegions.Where(r => r.Name != "Starting"))
-                {
-                    Names.Add([region.RuneName]);
-                }
-
-                CombineInChunks(Arts, Names, 7);
 
                 Console.ForegroundColor = ConsoleColor.Blue;
                 PrintAsciisHorizontally(Arts, true, 7);
@@ -186,20 +178,6 @@ namespace Backlog_Expedition
                 Console.WriteLine($"File not found: {filePath}");
                 return;
             }
-        }
-
-        private static List<T> CombineInChunks<T>(List<T> first, List<T> second, int chunkSize)
-        {
-            List<T> result = [];
-            int maxLength = Math.Max(first.Count, second.Count);
-
-            for (int i = 0; i < maxLength; i += chunkSize)
-            {
-                result.AddRange(first.Skip(i).Take(chunkSize));
-                result.AddRange(second.Skip(i).Take(chunkSize));
-            }
-
-            return result;
         }
     }
 }
