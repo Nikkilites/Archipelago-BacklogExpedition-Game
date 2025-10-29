@@ -53,15 +53,41 @@ namespace Backlog_Expedition
                 Console.ReadKey(true);
         }
 
-        public static void PrintLoginScreen()
+        public static void PrintMessages(List<string> messages, bool center = true, bool clear = true, bool wait = true, ConsoleColor color = ConsoleColor.White)
         {
+            if (clear)
+                Console.Clear();
+
+            Console.ForegroundColor = color;
+            foreach (string message in messages)
+            {
+                string thisMessage = message;
+                if (center)
+                {
+                    int windowWidth = Console.WindowWidth;
+                    int textLength = message.Length;
+                    int leftPadding = (windowWidth - textLength) / 2;
+                    thisMessage = new string(' ', leftPadding) + message;
+                }
+
+                Console.WriteLine(thisMessage);
+            }
+            Console.ResetColor();
+
+            if (wait)
+                Console.ReadKey(true);
+        }
+
+        public static void PrintLoginScreen(List<string> messages)
+        {
+            Console.Clear();
+
             HelperMethods.Log("Printing Login Screen");
             Console.ForegroundColor = ConsoleColor.Green;
             PrintAscii("island", true);
             Console.ResetColor();
 
-            PrintMessage("You find a mysterious signpost on the shore of the island that says:", clear: false, wait: false);
-            PrintMessage("'Please type in your archipelago room data'", clear: false, wait: false);
+            PrintMessages(messages, clear: false, wait: false);
             Console.WriteLine();
         }
 

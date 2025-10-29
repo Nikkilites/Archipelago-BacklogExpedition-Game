@@ -27,7 +27,7 @@ namespace Backlog_Expedition
 
             while (!ConnectionHandler.Connected)
             {
-                ScreenHandler.PrintLoginScreen();
+                ScreenHandler.PrintLoginScreen(DataStorageHandler.StoryData.login);
                 try
                 {
                     Console.ResetColor();
@@ -71,6 +71,8 @@ namespace Backlog_Expedition
             RegionHandler.CreateRegions(slotData);
 
             ScreenHandler.PrintMessage("Successfully connected to Archipelago! Press any key to continue to the game", color: ConsoleColor.Green);
+
+            ScreenHandler.PrintLoginScreen(DataStorageHandler.StoryData.introduction);
 
             PlayGame();
         }

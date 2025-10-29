@@ -13,9 +13,11 @@ namespace Backlog_Expedition
         public List<string> Containers { get; set; }
         public List<string> Entities => Monsters.Concat(Containers).ToList();
 
+        public StoryData StoryData { get; set; }
+
         public DataStorageHandler()
         {
-            GameData rawData = LoadData($"{Environment.CurrentDirectory}\\DataStorage\\data.json");
+            GameData rawData = LoadData<GameData>($"{Environment.CurrentDirectory}\\DataStorage\\data.json");
 
             Regions = ["Starting", .. rawData.extra_regions];
             Monsters = rawData.monsters;
@@ -23,9 +25,11 @@ namespace Backlog_Expedition
             LocationNames = CreateLocationNames(rawData, Regions, Containers);
             Items = CreateItemNames(rawData, Regions);
             Treasures = rawData.mcguffins;
+
+            StoryData = LoadData<StoryData>($"{Environment.CurrentDirectory}\\DataStorage\\data.json");
         }
 
-        private GameData LoadData(string dataPath)
+        private T LoadData<T>(string dataPath)
         {
             HelperMethods.Log($"Will load item data from {dataPath}");
 
@@ -33,7 +37,7 @@ namespace Backlog_Expedition
                 throw new FileNotFoundException("Failed to load Item data", dataPath);
 
             string json = File.ReadAllText(dataPath);
-            GameData _data = JsonConvert.DeserializeObject<GameData>(json)
+            T _data = JsonConvert.DeserializeObject<T>(json)
                 ?? throw new Exception("Failed to parse JSON data.");
 
             return _data;
