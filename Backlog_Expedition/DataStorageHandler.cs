@@ -8,7 +8,7 @@ namespace Backlog_Expedition
         public List<string> Regions { get; set; }
         public List<string> LocationNames { get; set; }
         public List<string> Items { get; set; }
-        public List<string> Mcguffins { get; set; }
+        public List<string> Treasures { get; set; }
         public List<string> Monsters { get; set; }
         public List<string> Containers { get; set; }
         public List<string> Entities => Monsters.Concat(Containers).ToList();
@@ -22,7 +22,7 @@ namespace Backlog_Expedition
             Containers = CreateContainerNames(rawData, Regions);
             LocationNames = CreateLocationNames(rawData, Regions, Containers);
             Items = CreateItemNames(rawData, Regions);
-            Mcguffins = rawData.mcguffins;
+            Treasures = rawData.mcguffins;
         }
 
         private GameData LoadData(string dataPath)

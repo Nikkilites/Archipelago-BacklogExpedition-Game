@@ -16,13 +16,13 @@ namespace Backlog_Expedition
             List<Region> regions = [];
 
             List<string> regionNames = GameHandler.DataStorageHandler.Regions;
-            List<string> mcGuffinNames = GameHandler.DataStorageHandler.Mcguffins;
+            List<string> treasureNames = GameHandler.DataStorageHandler.Treasures;
 
-            foreach (var (regionName, mcGuffinName) in regionNames.Zip(mcGuffinNames))
+            foreach (var (regionName, treasureName) in regionNames.Zip(treasureNames))
             {
                 List<Location> regionLocations = [.. locations.Where(l => l.Region == regionName)];
 
-                regions.Add(new Region(regionName, mcGuffinName, regionLocations));
+                regions.Add(new Region(regionName, treasureName, regionLocations));
             }
 
             Regions = regions;

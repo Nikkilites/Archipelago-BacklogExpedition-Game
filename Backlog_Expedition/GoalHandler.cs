@@ -5,7 +5,7 @@
         public int BeatenToGoal { get; set; } = 0;
         public void CheckIfGoal()
         {
-            if (GameHandler.RegionHandler.Regions.Where(r => r.McGuffinFound == true).Count() == BeatenToGoal)
+            if (GameHandler.RegionHandler.Regions.Where(r => r.TreasureFound == true).Count() == BeatenToGoal)
                 OnGoalConditionMet();
         }
 
