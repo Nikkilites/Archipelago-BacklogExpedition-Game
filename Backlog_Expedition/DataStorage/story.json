@@ -10,6 +10,18 @@
   "goal": [
     "Place goal description here."
   ],
+  "open_chest": {
+    "progression" : "Inside the CONTAINER Logmundr found ITEM for PLAYER. It looks very important",
+    "useful" : "Inside the CONTAINER Logmundr found ITEM for PLAYER. It looks very useful",
+    "filler" : "Inside the CONTAINER Logmundr found ITEM for PLAYER. It looks very useless",
+    "trap" : "Inside the CONTAINER Logmundr found ITEM for PLAYER. It looks very dangerous"
+  },
+  "slay_monster": {
+    "progression" : "The MONSTER dropped an ITEM for PLAYER. It looks very important",
+    "useful" : "The MONSTER dropped an ITEM for PLAYER. It looks very useful",
+    "filler" : "The MONSTER dropped an ITEM for PLAYER. It looks very useless",
+    "trap" : "The MONSTER dropped an ITEM for PLAYER. It looks very dangerous"
+  },
   "treasure_descriptions": {
     "Archipelago Map": [
       "Logmundr's eyes shine as he looks upon this map.", 
