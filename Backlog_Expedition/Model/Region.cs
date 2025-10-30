@@ -7,7 +7,7 @@
         public List<Location> Locations { get; private set; } = locations;
         public string RuneName => $"{Name} Rune";
         public bool RuneReceived => Name == "Starting" || GameHandler.ItemHandler.AvailableRunes.Exists(n => n == RuneName);
-        public bool TreasureFound => 0 == Locations.Where(l => l.Entity == "monster").ToList().Count;
+        public bool TreasureFound => 0 == Locations.Where(l => l.Entity == "monster").ToList().Count && RuneReceived;
         public string RuneAsciiFileName => $"rune_{Name.ToUpper()}".Replace(" ", "");
         public string RuneAsciiFileNameWText => $"{RuneAsciiFileName}_name";
         public string TreasureAsciiFileName => $"treasure_{TreasureName.ToUpper().Replace("'", "").Replace(" ", "")}";
