@@ -90,7 +90,17 @@ namespace Backlog_Expedition
 
                 foreach (Region region in availableRegions)
                 {
-                    Console.WriteLine($"{i}. Go to {region.Name} Island");
+                    string toAdd = "";
+                    if (region.TreasureFound)
+                    {
+                        toAdd = " (Treasure Found";
+                        if (region.Locations.Count() == 0)
+                            toAdd = $"{toAdd} - Fully Raided)";
+                        else
+                            toAdd = $"{toAdd})";
+                    }
+
+                    Console.WriteLine($"{i}. Go to {region.Name} Island{toAdd}");
                     i++;
                 }
 
