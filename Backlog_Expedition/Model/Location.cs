@@ -11,7 +11,7 @@ namespace Backlog_Expedition.Model
         public string Region => Name[(Name.LastIndexOf(" in ") + 4)..]
             .Replace(" Island", "");
         public string Entity => Name.StartsWith("Slay the ") ? "monster" : "container";
-        private string EntityName
+        public string EntityName
         {
             get
             {
