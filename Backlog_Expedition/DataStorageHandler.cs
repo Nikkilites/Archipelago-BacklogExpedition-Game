@@ -26,7 +26,7 @@ namespace Backlog_Expedition
             Items = CreateItemNames(rawData, Regions);
             Treasures = rawData.mcguffins;
 
-            StoryData = LoadData<StoryData>($"{Environment.CurrentDirectory}\\DataStorage\\data.json");
+            StoryData = LoadData<StoryData>($"{Environment.CurrentDirectory}\\DataStorage\\story.json");
         }
 
         private T LoadData<T>(string dataPath)

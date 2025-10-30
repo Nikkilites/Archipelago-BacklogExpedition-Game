@@ -4,74 +4,183 @@
     "'Please type in your archipelago room data'"
   ],
   "introduction": [
-    "Logmundr Backson arrives at this strange island with only one goal in mind....", 
-    "Collect Treasure and raid this entire place!"
+    "Logmundr Consolsson has no idea how long he has been sailing.",
+    "He has weathered storms, waves, sea monsters, whirpools ...", 
+    "The last night was a violent thunderstorm, with flashes of lightning showing shadows of land all around him,",
+    "But the winds just would not allow him to pull in to the safety of any harbor.",
+    "Now, with the dawning of the morning sun, our intrepid Viking has now washed up on a foreign shore,", 
+    "Golden sands scraping the keel of his dragonboat, and the water now gently lapping at his feet as he hops out.",
+    "Despite the hardships he has endured, there is only one thing on his mind.",
+    "Collect as much treasure as he can cram into the bottom of his boat and raid this entire place!"
   ],
   "goal": [
-    "Place goal description here."
+    "Logmundr cannot stuff a single extra treasure into his ship. He has covered every surface with the spoils of his raid.",
+    "It's time for him to return home, but he clutches the map that he found after his first trial in this Archipelago.",
+    "With riches like this, he knows that it will be only a matter of time before he returns to these strange shores!"
   ],
   "open_chest": {
-    "progression" : "Inside the CONTAINER Logmundr found ITEM for PLAYER. It looks very important",
-    "useful" : "Inside the CONTAINER Logmundr found ITEM for PLAYER. It looks very useful",
-    "filler" : "Inside the CONTAINER Logmundr found ITEM for PLAYER. It looks very useless",
-    "trap" : "Inside the CONTAINER Logmundr found ITEM for PLAYER. It looks very dangerous"
+    "progression" : "After checking it thoroughly for traps, Logmundr has managed to crack open the ENTITY. Inside, he found the ITEM for PLAYER. This strange item seems VERY important - it definitely has a use somewhere!",
+    "useful" : "It took Logmundr longer than he would have liked to open the ENTITY. Inside lay the ITEM for PLAYER. It looks like it may be used to make things a bit easier.",
+    "filler" : "Seriously? After all the time Logmundr spent trying to get inside the ENTITY? What the heck is this ITEM for PLAYER? It looks completely useless. He just tosses it away.",
+    "trap" : "Logmundr thinks he should not have opened the ENTITY. Inside, the ITEM for PLAYER lay in wait. This thing just oozes with menace, Logmundr should have left it where it was! He hopes it doesn't cause any trouble..."
   },
   "slay_monster": {
-    "progression" : "The MONSTER dropped an ITEM for PLAYER. It looks very important",
-    "useful" : "The MONSTER dropped an ITEM for PLAYER. It looks very useful",
-    "filler" : "The MONSTER dropped an ITEM for PLAYER. It looks very useless",
-    "trap" : "The MONSTER dropped an ITEM for PLAYER. It looks very dangerous"
+    "progression" : "As it crashes to the ground, the ENTITY released its grip on the ITEM for PLAYER. While not quite one of the Treasures he was looking for, this thing still looks incredibly important.",
+    "useful" : "After a long and grueling fight, the ENTITY was found to be guarding the ITEM for PLAYER. Maybe if Logmundr would have had something like this, this fight would have been a bit easier.",
+    "filler" : "Why, by all the gods, was the ENTITY holding on to the ITEM for PLAYER? This thing looks completely useless. It wasn't worth protecting it so viciously.",
+    "trap" : "Maybe the ENTITY wasn't protecting this ITEM for PLAYER, so much as guarding it. Maybe Logmundr should not have defeated this guardian - this item looks very dangerous!"
   },
   "treasure_descriptions": {
     "Archipelago Map": [
-      "Logmundr's eyes shine as he looks upon this map.", 
-      "Not a treasure in value, no, but now he knows where to find more treasure!"
+      "As the last monster falls, Logmundr peers behind it to something fluttering in the breeze.",
+      "As he draws closer, he realizes that it in fact, a faded map, printed on a large scrap of old vellum.", 
+      "An X is marked in one corner, on one of multiple small blobs.", 
+      "Each blob has varied shapes and sizes but they all have one thing in common - a strange rune etched in golden ink.", 
+      "This map may not be a treasure in terms of sheer value, but now he knows where to find the rest of the treasure!"
     ],
     "Desert Talisman": [
-      "Logmundr's eyes shine as he looks upon this map.", 
-      "Not a treasure in value, no, but now he knows where to find more treasure!"
+      "The sun beats down upon Logmundr, and he wipes his brow as he steps over the final monster on this Island.", 
+      "Something glints at him from the sand, bright metal reflecting the sunlight directly into his eyes.",
+      "He brushes the sand away, and lifts a glimmering object up to inspect it more closely.",
+      "A golden object, shaped like an intricate knot, or perhaps the wings of a bird, with a large, red gemstone in the middle of a loop at the top.",
+      "Some sort of Desert Talisman, but certainly valuable!"
     ],
     "Tropical Amulet": [
-      "Logmundr's eyes shine as he looks upon this map.", 
-      "Not a treasure in value, no, but now he knows where to find more treasure!"
+      "Vikings are not used to this sweltering humidity, and Logmundr is glad that there are no more monsters to vanquish.", 
+      "But as he starts to search for the treasure hidden on this Island, he notices movement swaying from a palm branch to his left.",
+      "The gold of the chain blends in well with the yellows and greens of the thick flowers around him.",
+      "The bright green gemstone set in the middle of a large pendant sparkles as he removes the Tropical Amulet from its branch.",
+      "Another hard won treasure!"
     ],
     "Fire Ring": [
-      "Logmundr's eyes shine as he looks upon this map.", 
-      "Not a treasure in value, no, but now he knows where to find more treasure!"
+      "As Logmundr lands the final blow upon this last creature, it falls to the ground with a thump and a cough.", 
+      "From the creature's mouth rolls a strange rock that looks vaguely like a lump of glowing coal.", 
+      "Logmundr picks it up, nearly dropping it due to its intense heat, and crushes it in his hand.", 
+      "As the crumbling cinders fall from his hands, what is left behind is a gleaming golden Fire Ring set with the largest diamond he has ever seen!"
     ],
     "Ice Shard": [
-      "Logmundr's eyes shine as he looks upon this map.", 
-      "Not a treasure in value, no, but now he knows where to find more treasure!"
+      "A swirl of snowflakes fly into the air as the final monster falls.", 
+      "The chaotic movement of their battle has caused the icicle-laden branches around the combatants to shake dangerously.", 
+      "With a riot of clinks, sharp cracks and shatting crashes, dozens of giant icicles fall to the ground around Logmundr.", 
+      "Peeking from behind his shield as the snow settles once more, Logmundrs breath comes out in a suprised puff in the cold air -", 
+      "One of the icicles remains intact, shining like blue silver glass, but stuck deep into the ground where all of its companions have shattered.",
+      "He picks it up, marveling at how this Ice Shard is as strong as steel and yet is still freezing to the touch."
     ],
     "Gemstone Crown": [
-      "Logmundr's eyes shine as he looks upon this map.", 
-      "Not a treasure in value, no, but now he knows where to find more treasure!"
+      "Finally, the last creature falls, its cries echoing around the jagged walls of the gemstone geodes that Logmundr has been searching through.", 
+      "This whole island could be considered a treasure, if only Logmundr could figure out how to remove these crystals from the walls.",
+      "But, as he looks around, his eyes fall upon something much more portable, and something that he at least is sure has value and isn't just colored glass.",
+      "A beautiful Gemstone Crown, wrought from silver, with rubies, sapphires, emeralds, topaz, and amethysts gleaming from the crown's points and band.",
+      "This doesn't quite fit over his helmet, but it will be coming home with him nonetheless!"
     ],
     "Climbing Gloves": [
-      "Logmundr's eyes shine as he looks upon this map.", 
-      "Not a treasure in value, no, but now he knows where to find more treasure!"
+      "Not all Vikings are used to mountains. Logmundr certainly is not.", 
+      "But despite his exhaustion, he has finally felled the last monster. Behind it are the remains of the last adventurer who tried to conquer these peaks.",
+      "Still placed upon its skeletal hands are a pair of sturdy, yet supple leather Climbing Gloves.",
+      "The palms are textured to grip the rock and there's wonderful embroidery of eagles and mountain peaks on the backs and along the fingers.",
+      "These would have been great to find on his way up this mountain!"
     ],
     "Cherry Wand": [
-      "Logmundr's eyes shine as he looks upon this map.", 
-      "Not a treasure in value, no, but now he knows where to find more treasure!",
-      "More lines as needed",
-      "As many as you like"
+      "The pink flowers of the trees surrounding him sway in the gentle breeze now that there are no more monsters for Logmundr to fight.", 
+      "He follows a blossom as it slowly twirls down to the ground, landing on a large, smooth stone.",
+      "Laying on the stone, as if placed there, just waiting for him, is a slender, elegant branch sitting on a perfectly sized depression in the rock.",
+      "Perhaps this Cherry Wand has latent magics that he will be able to discover on his travels!"
     ],
-    "Swamp Waders": [""],
-    "Jungle Staff": [""],
-    "Pinecone Helmet": [""],
-    "Orchard Sickle": [""],
-    "Plains Greaves": [""],
-    "Glacier Diadem": [""],
-    "Tar Bracelet": [""],
-    "Candycane": [""],
-    "Christmas Present": [""],
-    "Another Man's Treasure": [""],
-    "Forgotten Mask": [""],
-    "Giant Toadstool": [""],
-    "Miniature Mech": [""],
-    "Moon Rocks": [""],
-    "Golden Meeple": [""],
-    "The Missing Piece": [""]
+    "Swamp Waders": [
+      "Glad that this fight is finally over, Logmundr kicks off his sodden, chafing boots. He has been pulling his feet out of deep mud holes this entire time.", 
+      "He sits on the least rotten log he can find to rest, peering around the murky waters and tangled vegetation that surrounds him.",
+      "But what is that, propped against the trunk of a nearby tree? ",
+      "A pair of thick boots, seemingly made from some strange, springy sap-like substance. It seems to just compeletely repel the water around it.",
+      "Trying them on, these Swamp Waders go almost all the way up to Logmundr's knees! No wet feet anymore for him!"
+    ],
+    "Jungle Staff": [
+      "The dense foliage and leaves of this island made it very difficult for Logmundr to fight these monsters.", 
+      "His axe has destroyed so many trees, plants, and shrubs through his combats.",
+      "One of the hacked off branches looks a bit smoother, laying beneath all of the leaves. Logmundr picks it out and inspects it.",
+      "It seems to be some sort of Jungle Staff - with vines carved into the dark reddish wood and gilded leaves attached near the top."
+    ],
+    "Pinecone Helmet": [
+      "Logmundr notices a giant pinecone next to where he felled the final monster of this Island.", 
+      "He rolls it over and notices it is, in fact, hollow inside. The large scales of the pinecone are more of a shell.",
+      "Turning it around in his hands, he realizes that this actually a Pinecone Helmet!",
+      "What a wonderful treasure for our daring Viking!"
+    ],
+    "Orchard Sickle": [
+      "Feeling hungry after his daring fights, Logmundr plucks a shiny red apple from one of the laden branches surrounding him.", 
+      "Sitting next to the trunk of one of the fruit trees is a sturdily built basket.",
+      "Peeking inside the basket, Logmundr finds a bright and shiny sickle, with a sharp curved blade.",
+      "This Orchard Sickle is masterfully made!"
+    ],
+    "Plains Greaves": [
+      "The long prairie grasses sway around the combatants as the battle draws to a close.", 
+      "Disturbed by the ruckus, a group of bison move out from the wallow they were occupying by the river.",
+      "Logmundr notices something glittering in the sunlight where they had once been laying.",
+      "A pair of shiny metal-rimmed Plains Greaves with intricate leather tooling - clearly this Island's Treasure!"
+    ],
+    "Glacier Diadem": [
+      "The cold sunlight bounces off the shiny ice walls of the glaciers around the battlefield.", 
+      "In a slowly melting cave lays an intricate, twisting metal tiara with clear ice blue gems set along its delicate headband.",
+      "A beautiful Glacier Diadem, the perfect gift for a Shieldmaiden back home!"
+    ],
+    "Tar Bracelet": [
+      "Logmundr is so incredibly glad to be finished with this island. It absolutely stinks of rotten eggs.", 
+      "Slowly bubbling pools of tar simmer around him, the black ooze moving in an alarming way.",
+      "One of the largest bubbles burst, coughing up a hard stone band at Logmundr's feet.",
+      "Picking up the smooth hematite Tar Bracelet, he marvels at how something so smooth could come from something so vile."
+    ],
+    "Candycane": [
+      "Logmundr's stomach rumbles. He has been surrounded by sugary sweetness this entire time. The grass is made of candy floss.", 
+      "The leaves seem to be gummy candies coated in a sour sugar. Even the monsters seemed to have a candy coating.",
+      "Propped against the back of a shallow rock-candy studded cave is the largest, most sturdy looking Candy Cane Logmundr has ever seen.",
+      "This treasure doubles as a snack AND a weapon!"
+    ],
+    "Christmas Present": [
+      "Every Viking knows that the mysterious figure that brings presents to the good Viking children and coal to the bad ones lives in Lapland.", 
+      "Finding a neatly wrapped Christmas Present beneath a tall evergreen tree, Logmundr wonders ...",
+      "Did that Christmas Rune transport him somehow to Lapland?",
+      "That's a question for another day. For now, we can just raid the Present."
+    ],
+    "Another Man's Treasure": [
+      "This island has been nothing but stinking refuse, piles of discarded furniature, and things long past their use.", 
+      "Logmundr swears he saw some sort of striped animal rummaging through the piles at some point.",
+      "Shrugging, Logmundr sifts through a pile to find the most interesting piece of rubbish he can find.",
+      "After all, you know what they say - one man's trash is Another Man's Treasure!"
+    ],
+    "Forgotten Mask": [
+      "Where has the sun gone? Logmundr has been fighting in the dark the entire time he has been on this island.", 
+      "This place reminds him of the horror stories his father used to tell him back when he was a child.",
+      "Laying perfectly still in the path before him, whisps of fog wrapping around it, lays an eerie, Forgotten Mask.",
+      "If it werent for the gold inlay, he would definitely leave this spooky treasure behind."
+    ],
+    "Giant Toadstool": [
+      "The monsters here had made their homes in the shade of massive, towering mushrooms.", 
+      "The light has a strange, hazy quality as thousands of spores filter down from the gills above.",
+      "Surely, Logmundr thinks, this Giant Toadstool would be of use to the soothsayers back home.",
+      "Just think of the magics they could create with such a potent ingredient!"
+    ],
+    "Miniature Mech": [
+      "The monsters in this place moved strangely, with jerky movements and whirring noises whenever they struck.", 
+      "In the back of one of the creature's lairs, Logmundr finds the strangest thing - strange enough to be a valuable treasure!",
+      "A small, hollowed out creature, sized to fit a very small child (or perhaps a dwarven smith),",
+      "this Miniature Mech seems almost like a battle-ready suit for those with smaller frames!"
+    ],
+    "Moon Rocks": [
+      "Fighting on this island has been incredibly strange. Instead of the normal heavens, looking up, Logmundr has seen a blue and green marbled sphere.", 
+      "Surely, SURELY he couldn't be on the actual MOON?",
+      "Using the remains of the monster he just defeated, he scrapes up a large chunk of Moon Rocks.",
+      "Nobody back home would believe him otherise!"
+    ],
+    "Golden Meeple": [
+      "As the final monster, after having waited patiently for Logmundr to attack it before it launched an attack itself, falls", 
+      "Something falls to the ground from its clutches. It bounces a few times before clinking gently against Logmundr's boot.",
+      "It's a little golden man, and just feels right clutched in his hand.",
+      "This Golden Meeple, despite being so small, may be one of this Archipelago's greatest treasures of all!"
+    ],
+    "The Missing Piece": [
+      "The fights on this island have been difficult, having to hop over weirdly shaped holes in the ground that seem to fall away into a void of nothingness.", 
+      "As the final monster falls, part of it separates from its body and lands next to Logmundr's axe.",
+      "Seemingly made of smooth stone, despite the very real monster he just fought, Logmundr decides to keep this Missing Piece.",
+      "Clearly something is special about this Treasure!"
+    ]
   }
 }
