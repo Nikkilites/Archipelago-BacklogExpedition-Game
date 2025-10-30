@@ -8,13 +8,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Ascii\**" />
-    <EmbeddedResource Remove="Ascii\**" />
-    <None Remove="Ascii\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Archipelago.MultiClient.Net" Version="6.7.0" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="DataStorage\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  
 </Project>
