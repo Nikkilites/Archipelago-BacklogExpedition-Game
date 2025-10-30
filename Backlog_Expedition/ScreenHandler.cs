@@ -1,10 +1,72 @@
 ﻿using Backlog_Expedition.Model;
+using Archipelago.MultiClient.Net.Enums;
+using System.Drawing;
 
 namespace Backlog_Expedition
 {
     public static class ScreenHandler
     {
         private static readonly string asciiArtPath = $"{Environment.CurrentDirectory}\\DataStorage\\Ascii";
+
+        public static void PrintLoginScreen(List<string> messages)
+        {
+            Console.Clear();
+
+            HelperMethods.Log("Printing Login Screen");
+            Console.ForegroundColor = ConsoleColor.Green;
+            PrintAscii("island", true);
+            Console.ResetColor();
+
+            PrintMessages(messages, clear: false, wait: false);
+            Console.WriteLine();
+        }
+
+        public static void PrintConnectedScreen(string message)
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Green;
+            PrintAscii("archipelago_medium", true);
+            Console.WriteLine();
+            Console.ResetColor();
+
+            PrintMessage(message, true, false, true, color: ConsoleColor.Green);
+        }
+
+        public static void PrintIntroScreen(List<string> messages)
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.White;
+            PrintAscii("intro", true);
+            Console.WriteLine();
+            Console.ResetColor();
+
+            PrintMessages(messages, true, false, true, color: ConsoleColor.White);
+        }
+
+        public static void PrintMainScreen(List<Region> availableRegions)
+        {
+            HelperMethods.Log("Printing Main Screen");
+
+            Console.Clear();
+
+            List<string> runeFileNames = [.. availableRegions.Where(r => r.Name != "Starting").Select(r => r.RuneAsciiFileNameWText)];
+
+            if (runeFileNames.Count == 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Gray;
+                PrintMessage("You do not have any runes.", clear: false, wait: false);
+                Console.WriteLine();
+            }
+            else
+            {
+                List<string[]> Arts = LoadMultipleArtFiles(runeFileNames);
+
+                Console.ForegroundColor = ConsoleColor.Blue;
+                PrintAsciisHorizontally(Arts, true, 7);
+            }
+            Console.ResetColor();
+            Console.WriteLine();
+        }
 
         public static void PrintIslandScreen(Region region)
         {
@@ -21,7 +83,7 @@ namespace Backlog_Expedition
             Console.WriteLine();
         }
 
-        private static void PrintIslandLocations(List<Location> locations)
+        public static void PrintIslandLocations(List<Location> locations)
         {
             List<string> filenames = [];
 
@@ -31,6 +93,67 @@ namespace Backlog_Expedition
             }
 
             PrintAsciisHorizontally(LoadMultipleArtFiles(filenames), true, 7);
+        }
+
+        public static void PrintLocationScreen(Location location, Dictionary<string, string> descriptions)
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Blue;
+            PrintAscii("archipelago_large", true);
+            Console.WriteLine();
+            Console.ResetColor();
+
+            string message = "";
+
+            ConsoleColor color = ConsoleColor.White;
+
+            switch (location.ScoutedInfo.Flags)
+            {
+                case ItemFlags.Advancement:
+                    message = descriptions["progression"];
+                    color = ConsoleColor.Magenta;
+                    break;
+                case ItemFlags.NeverExclude:
+                    message = descriptions["useful"];
+                    color = ConsoleColor.Cyan;
+                    break;
+                case ItemFlags.Trap:
+                    message = descriptions["trap"];
+                    color = ConsoleColor.Red;
+                    break;
+                default:
+                    message = descriptions["filler"];
+                    color = ConsoleColor.Gray;
+                    break;
+            }
+
+            PrintMessage(message
+                .Replace("ENTITY", location.EntityName)
+                .Replace("ITEM", location.ScoutedInfo.ItemName)
+                .Replace("PLAYER", location.ScoutedInfo.Player.Name), clear: false, color: color);
+        }
+
+        public static void PrintTreasureScreen(Region region, Dictionary<string, List<string>> descriptions)
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Magenta;
+            PrintAscii(region.TreasureAsciiFileName, true);
+            Console.WriteLine();
+            Console.ResetColor();
+
+            List<string> treasure_description = descriptions.Where(d => d.Key == region.TreasureName).ToList()[0].Value;
+            PrintMessages(treasure_description, true, false, true);
+        }
+
+        public static void PrintGoalScreen(List<string> goal)
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Green;
+            PrintAscii("goal", true);
+            Console.WriteLine();
+            Console.ResetColor();
+
+            PrintMessages(goal, true, false, color: ConsoleColor.Green);
         }
 
         public static void PrintMessage(string message, bool center = true, bool clear = true, bool wait = true, ConsoleColor color = ConsoleColor.White)
@@ -76,45 +199,6 @@ namespace Backlog_Expedition
 
             if (wait)
                 Console.ReadKey(true);
-        }
-
-        public static void PrintLoginScreen(List<string> messages)
-        {
-            Console.Clear();
-
-            HelperMethods.Log("Printing Login Screen");
-            Console.ForegroundColor = ConsoleColor.Green;
-            PrintAscii("island", true);
-            Console.ResetColor();
-
-            PrintMessages(messages, clear: false, wait: false);
-            Console.WriteLine();
-        }
-
-        public static void PrintMainScreen(List<Region> availableRegions)
-        {
-            HelperMethods.Log("Printing Main Screen");
-
-            Console.Clear();
-
-            List<string> runeFileNames = [.. availableRegions.Where(r => r.Name != "Starting").Select(r => r.RuneAsciiFileNameWText)];
-
-            if (runeFileNames.Count == 0)
-            {
-                Console.ForegroundColor = ConsoleColor.Gray;
-                PrintMessage("You do not have any runes.", clear: false, wait: false);
-                Console.WriteLine();
-                Console.WriteLine();
-            }
-            else
-            {
-                List<string[]> Arts = LoadMultipleArtFiles(runeFileNames);
-
-                Console.ForegroundColor = ConsoleColor.Blue;
-                PrintAsciisHorizontally(Arts, true, 7);
-            }
-            Console.ResetColor();
-            Console.WriteLine();
         }
 
         private static List<string[]> LoadMultipleArtFiles(List<string> runeFileNames)

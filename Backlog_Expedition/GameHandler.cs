@@ -70,9 +70,9 @@ namespace Backlog_Expedition
 
             RegionHandler.CreateRegions(slotData);
 
-            ScreenHandler.PrintMessage("Successfully connected to Archipelago! Press any key to continue to the game", color: ConsoleColor.Green);
+            ScreenHandler.PrintConnectedScreen("Successfully connected to Archipelago! Press any key to continue to the game");
 
-            ScreenHandler.PrintLoginScreen(DataStorageHandler.StoryData.introduction);
+            ScreenHandler.PrintIntroScreen(DataStorageHandler.StoryData.introduction);
 
             PlayGame();
         }
@@ -153,6 +153,14 @@ namespace Backlog_Expedition
                         Location pickedLocation = region.Locations[keypress - 1];
 
                         region.CheckLocation(pickedLocation);
+
+                        Dictionary<string, string> descriptions = pickedLocation.Entity == "monster" ? DataStorageHandler.StoryData.slay_monster : DataStorageHandler.StoryData.open_chest;
+                        ScreenHandler.PrintLocationScreen(pickedLocation, descriptions);
+
+                        if (region.TreasureFound && pickedLocation.Entity == "monster")
+                            ScreenHandler.PrintTreasureScreen(region, DataStorageHandler.StoryData.treasure_descriptions);
+
+                        GoalHandler.CheckIfGoal();
                     }
                     else if (keypress == i)
                     {
