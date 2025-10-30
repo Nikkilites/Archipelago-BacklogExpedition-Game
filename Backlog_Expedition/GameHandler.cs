@@ -117,13 +117,11 @@ namespace Backlog_Expedition
                     else
                     {
                         ScreenHandler.PrintMessage("Invalid input! Press to try again", color: ConsoleColor.Yellow);
-                        Console.ReadKey(true);
                     }
                 }
                 else
                 {
                     ScreenHandler.PrintMessage("Invalid input! Press to try again", color: ConsoleColor.Yellow);
-                    Console.ReadKey(true);
                 }
             }
             Environment.Exit(0);
@@ -163,13 +161,11 @@ namespace Backlog_Expedition
                     else
                     {
                         ScreenHandler.PrintMessage("Invalid input! Press to try again", color: ConsoleColor.Yellow);
-                        Console.ReadKey(true);
                     }
                 }
                 else
                 {
                     ScreenHandler.PrintMessage("Invalid input! Press to try again", color: ConsoleColor.Yellow);
-                    Console.ReadKey(true);
                 }
             }
         }
