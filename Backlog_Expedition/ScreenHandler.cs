@@ -70,6 +70,8 @@ namespace Backlog_Expedition
 
         public static void PrintIslandScreen(Region region)
         {
+            HelperMethods.Log($"Printing {region.Name} Island screen");
+
             Console.Clear();
             Console.WriteLine($"{region.Name} Island");
 
