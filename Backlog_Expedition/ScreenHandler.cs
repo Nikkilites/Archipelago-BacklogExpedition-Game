@@ -32,6 +32,16 @@ namespace Backlog_Expedition
             PrintMessage(message, true, false, true, color: ConsoleColor.Green);
         }
 
+        public static void PrintDisconnectedScreen(List<string> messages)
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Red;
+            PrintAscii("archipelago_medium", true);
+            Console.WriteLine();
+
+            PrintMessages(messages, true, false, true, color: ConsoleColor.Red);
+        }
+
         public static void PrintIntroScreen(List<string> messages)
         {
             Console.Clear();
