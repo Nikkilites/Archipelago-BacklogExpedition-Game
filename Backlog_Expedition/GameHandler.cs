@@ -94,12 +94,16 @@ namespace Backlog_Expedition
 
                 foreach (Region region in availableRegions)
                 {
+                    Console.ForegroundColor = ConsoleColor.White;
                     string toAdd = "";
                     if (region.TreasureFound)
                     {
                         toAdd = " (Treasure Found";
                         if (region.Locations.Count() == 0)
+                        { 
                             toAdd = $"{toAdd} - Fully Raided)";
+                            Console.ForegroundColor = ConsoleColor.Gray;
+                        }
                         else
                             toAdd = $"{toAdd})";
                     }
