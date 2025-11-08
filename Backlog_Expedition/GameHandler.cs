@@ -88,7 +88,7 @@ namespace Backlog_Expedition
             {
                 List<Region> availableRegions = [.. RegionHandler.Regions.Where(r => r.RuneReceived == true)];
 
-                ScreenHandler.PrintMainScreen(availableRegions);
+                ScreenHandler.PrintMainScreen(availableRegions, GoalHandler);
 
                 int i = 1;
 

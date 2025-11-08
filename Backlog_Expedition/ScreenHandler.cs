@@ -53,11 +53,15 @@ namespace Backlog_Expedition
             PrintMessages(messages, true, false, true, color: ConsoleColor.White);
         }
 
-        public static void PrintMainScreen(List<Region> availableRegions)
+        public static void PrintMainScreen(List<Region> availableRegions, GoalHandler goalHandler)
         {
             HelperMethods.Log("Printing Main Screen");
 
             Console.Clear();
+
+            Console.WriteLine();
+            PrintMessage($"Treasures found: {goalHandler.TreasuresFound}/{goalHandler.TreasuresToGoal}", clear: false, wait: false);
+            Console.WriteLine();
 
             List<string> runeFileNames = [.. availableRegions.Where(r => r.Name != "Starting").Select(r => r.RuneAsciiFileNameWText)];
 
