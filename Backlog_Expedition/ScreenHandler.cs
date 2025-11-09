@@ -57,10 +57,8 @@ namespace Backlog_Expedition
         {
             HelperMethods.Log("Printing Main Screen");
 
-            Console.Clear();
-
             Console.WriteLine();
-            PrintMessage($"Treasures found: {goalHandler.TreasuresFound}/{goalHandler.TreasuresToGoal}", clear: false, wait: false);
+            PrintMessage($"Treasures found: {goalHandler.TreasuresFound}/{goalHandler.TreasuresToGoal}", wait: false);
             Console.WriteLine();
 
             List<string> runeFileNames = [.. availableRegions.Where(r => r.Name != "Starting").Select(r => r.RuneAsciiFileNameWText)];
@@ -86,8 +84,9 @@ namespace Backlog_Expedition
         {
             HelperMethods.Log($"Printing {region.Name} Island screen");
 
-            Console.Clear();
-            Console.WriteLine($"{region.Name} Island");
+            Console.WriteLine();
+            PrintMessage($"{region.Name} Island", wait: false);
+            Console.WriteLine();
 
             Console.ForegroundColor = ConsoleColor.Red;
             PrintIslandLocations([.. region.Locations.Where(l => l.Entity == "monster")]);
