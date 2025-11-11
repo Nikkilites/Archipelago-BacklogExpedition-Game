@@ -67,6 +67,7 @@ namespace Backlog_Expedition.Archipelago
             {
                 Connected = false;
                 session = null;
+                HelperMethods.Log($"Disconnected {reason}");
                 Updater.Stop();
             }
         }
@@ -74,7 +75,8 @@ namespace Backlog_Expedition.Archipelago
         public void OnError(Exception e, string message)
         {
             message += $"\n    Called from OnError";
-            throw new Exception(message);
+            HelperMethods.Log($"Disconnected {message}");
+            throw e;
         }
 
         public async void SendLocation(long apId)

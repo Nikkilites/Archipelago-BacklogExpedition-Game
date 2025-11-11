@@ -25,77 +25,85 @@ namespace Backlog_Expedition
         {
             HelperMethods.ClearLog();
 
-            while (!ConnectionHandler.Connected)
+            bool gameIsOpen = true;
+            while (gameIsOpen)
             {
-                ScreenHandler.PrintLoginScreen(DataStorageHandler.StoryData.login);
-                try
+                while (!ConnectionHandler.Connected)
                 {
-                    Console.ResetColor();
-
-                    Console.WriteLine("Server: ");
-                    string? server = Console.ReadLine()?.Trim();
-
-                    Console.WriteLine("Player: ");
-                    string? player = Console.ReadLine()?.Trim();
-
-                    Console.WriteLine("Password (optional): ");
-                    string? pass = Console.ReadLine()?.Trim();
-                    pass ??= string.Empty;
-
-                    if (string.IsNullOrWhiteSpace(server) || string.IsNullOrWhiteSpace(player))
+                    ScreenHandler.PrintLoginScreen(DataStorageHandler.StoryData.login);
+                    try
                     {
-                        ScreenHandler.PrintMessage("Server and Player fields are required. Press any key to try again.", color: ConsoleColor.Yellow);
-                        continue;
+                        Console.ResetColor();
+
+                        Console.WriteLine("Server: ");
+                        string? server = Console.ReadLine()?.Trim();
+
+                        Console.WriteLine("Player: ");
+                        string? player = Console.ReadLine()?.Trim();
+
+                        Console.WriteLine("Password (optional): ");
+                        string? pass = Console.ReadLine()?.Trim();
+                        pass ??= string.Empty;
+
+                        if (string.IsNullOrWhiteSpace(server) || string.IsNullOrWhiteSpace(player))
+                        {
+                            ScreenHandler.PrintMessage("Server and Player fields are required. Press any key to try again.", color: ConsoleColor.Yellow);
+                            continue;
+                        }
+
+                        bool success = ConnectionHandler.Connect(server, player, pass);
+
+                        if (!success)
+                        {
+                            ScreenHandler.PrintMessage("Connection failed. Press any key to try again.", color: ConsoleColor.Red);
+                            continue;
+                        }
+
+                        ItemHandler.SetupFrameUpdater();
                     }
-
-                    bool success = ConnectionHandler.Connect(server, player, pass);
-
-                    if (!success)
+                    catch (Exception ex)
                     {
-                        ScreenHandler.PrintMessage("Connection failed. Press any key to try again.", color: ConsoleColor.Red);
-                        continue;
+                        ScreenHandler.PrintMessage($"Unexpected error while connecting:\n{ex.Message}\nPress any key to try again.", color: ConsoleColor.Red);
                     }
+                }
 
-                    ItemHandler.SetupFrameUpdater();
-                }
-                catch (Exception ex)
-                {
-                    ScreenHandler.PrintMessage($"Unexpected error while connecting:\n{ex.Message}\nPress any key to try again.", color: ConsoleColor.Red);
-                }
+                Dictionary<string, object> slotData = ConnectionHandler.SlotData;
+
+                GoalHandler.TreasuresToGoal = Convert.ToInt32(slotData["beaten_to_goal"]);
+
+                RegionHandler.CreateRegions(slotData);
+
+                ScreenHandler.PrintConnectedScreen("Successfully connected to Archipelago! Press any key to continue to the game");
+
+                ScreenHandler.PrintIntroScreen(DataStorageHandler.StoryData.introduction);
+
+                PlayGame();
             }
-
-            Dictionary<string, object> slotData = ConnectionHandler.SlotData;
-
-            GoalHandler.BeatenToGoal = Convert.ToInt32(slotData["beaten_to_goal"]);
-
-            RegionHandler.CreateRegions(slotData);
-
-            ScreenHandler.PrintConnectedScreen("Successfully connected to Archipelago! Press any key to continue to the game");
-
-            ScreenHandler.PrintIntroScreen(DataStorageHandler.StoryData.introduction);
-
-            PlayGame();
         }
 
         private static void PlayGame()
         {
             bool inMenu = true;
-            while (inMenu)
+            while (inMenu && ConnectionHandler.Connected)
             {
                 List<Region> availableRegions = [.. RegionHandler.Regions.Where(r => r.RuneReceived == true)];
 
-                ScreenHandler.PrintMainScreen(availableRegions);
+                ScreenHandler.PrintMainScreen(availableRegions, GoalHandler);
 
                 int i = 1;
 
                 foreach (Region region in availableRegions)
                 {
+                    Console.ForegroundColor = ConsoleColor.White;
                     string toAdd = "";
                     if (region.TreasureFound)
                     {
                         toAdd = " (Treasure Found";
                         if (region.Locations.Count() == 0)
+                        { 
                             toAdd = $"{toAdd} - Fully Raided)";
+                            Console.ForegroundColor = ConsoleColor.Gray;
+                        }
                         else
                             toAdd = $"{toAdd})";
                     }
@@ -110,7 +118,13 @@ namespace Backlog_Expedition
 
                 string? selection = Console.ReadLine()?.Trim();
 
-                if (selection != null && int.TryParse(selection, out int keypress))
+                if (!ConnectionHandler.Connected)
+                {
+                    ScreenHandler.PrintDisconnectedScreen(["You have been disconnected from archipelago!", "Please login again."]);
+                    inMenu = false;
+                    continue;
+                }
+                else if (selection != null && int.TryParse(selection, out int keypress))
                 {
                     if (keypress > 0 && keypress <= availableRegions.Count)
                     {
@@ -123,6 +137,7 @@ namespace Backlog_Expedition
                     else if (keypress == i)
                     {
                         inMenu = false;
+                        Environment.Exit(0);
                     }
                     else
                     {
@@ -134,13 +149,12 @@ namespace Backlog_Expedition
                     ScreenHandler.PrintMessage("Invalid input! Press to try again", color: ConsoleColor.Yellow);
                 }
             }
-            Environment.Exit(0);
         }
 
         private static void OpenIsland(Region region)
         {
             bool onIsland = true;
-            while (onIsland)
+            while (onIsland && ConnectionHandler.Connected)
             {
                 ScreenHandler.PrintIslandScreen(region);
 
@@ -156,7 +170,13 @@ namespace Backlog_Expedition
 
                 string? selection = Console.ReadLine()?.Trim();
 
-                if (selection != null && int.TryParse(selection, out int keypress))
+                if (!ConnectionHandler.Connected)
+                {
+                    ScreenHandler.PrintDisconnectedScreen(["You have been disconnected from archipelago!", "The location has not been sent.", "Please log in again."]);
+                    onIsland = false;
+                    continue;
+                }
+                else if (selection != null && int.TryParse(selection, out int keypress))
                 {
                     if (keypress > 0 && keypress <= region.Locations.Count)
                     {

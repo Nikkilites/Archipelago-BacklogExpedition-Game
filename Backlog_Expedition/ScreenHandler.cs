@@ -32,6 +32,16 @@ namespace Backlog_Expedition
             PrintMessage(message, true, false, true, color: ConsoleColor.Green);
         }
 
+        public static void PrintDisconnectedScreen(List<string> messages)
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Red;
+            PrintAscii("archipelago_medium", true);
+            Console.WriteLine();
+
+            PrintMessages(messages, true, false, true, color: ConsoleColor.Red);
+        }
+
         public static void PrintIntroScreen(List<string> messages)
         {
             Console.Clear();
@@ -43,11 +53,13 @@ namespace Backlog_Expedition
             PrintMessages(messages, true, false, true, color: ConsoleColor.White);
         }
 
-        public static void PrintMainScreen(List<Region> availableRegions)
+        public static void PrintMainScreen(List<Region> availableRegions, GoalHandler goalHandler)
         {
             HelperMethods.Log("Printing Main Screen");
 
-            Console.Clear();
+            Console.WriteLine();
+            PrintMessage($"Treasures found: {goalHandler.TreasuresFound}/{goalHandler.TreasuresToGoal}", wait: false);
+            Console.WriteLine();
 
             List<string> runeFileNames = [.. availableRegions.Where(r => r.Name != "Starting").Select(r => r.RuneAsciiFileNameWText)];
 
@@ -72,8 +84,9 @@ namespace Backlog_Expedition
         {
             HelperMethods.Log($"Printing {region.Name} Island screen");
 
-            Console.Clear();
-            Console.WriteLine($"{region.Name} Island");
+            Console.WriteLine();
+            PrintMessage($"{region.Name} Island", wait: false);
+            Console.WriteLine();
 
             Console.ForegroundColor = ConsoleColor.Red;
             PrintIslandLocations([.. region.Locations.Where(l => l.Entity == "monster")]);

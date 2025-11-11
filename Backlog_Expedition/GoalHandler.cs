@@ -2,11 +2,11 @@
 {
     public class GoalHandler
     {
-        public int BeatenToGoal { get; set; } = 0;
+        public int TreasuresToGoal { get; set; } = 0;
+        public int TreasuresFound => GameHandler.RegionHandler.Regions.Where(r => r.TreasureFound == true).ToList().Count();
         public void CheckIfGoal()
         {
-            int treasuresFound = GameHandler.RegionHandler.Regions.Where(r => r.TreasureFound == true).ToList().Count();
-            if (treasuresFound == BeatenToGoal)
+            if (TreasuresFound == TreasuresToGoal)
                 
                 OnGoalConditionMet();
         }
