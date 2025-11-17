@@ -226,6 +226,8 @@ namespace Backlog_Expedition
                 ScreenHandler.PrintHintShopScreen(ItemHandler.TrashAvailable);
 
                 int hintCost = (int)Math.Round(ItemHandler.TrashInWorld / 20.0, MidpointRounding.AwayFromZero);
+                if (hintCost <= 1)
+                    hintCost = 1;
 
                 Console.WriteLine($"1. Purchase Hint (Cost: {hintCost} trash)");
                 Console.WriteLine($"2. Return to Map");
