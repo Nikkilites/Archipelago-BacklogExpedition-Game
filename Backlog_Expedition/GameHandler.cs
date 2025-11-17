@@ -1,4 +1,6 @@
-﻿using Backlog_Expedition.Archipelago;
+﻿using Archipelago.MultiClient.Net.Enums;
+using Archipelago.MultiClient.Net.Models;
+using Backlog_Expedition.Archipelago;
 using Backlog_Expedition.Model;
 using System.Data;
 
@@ -112,6 +114,8 @@ namespace Backlog_Expedition
                     i++;
                 }
 
+                Console.WriteLine($"{i}. Go to the Hint Shop");
+                i++;
                 Console.WriteLine($"{i}. Refresh");
                 i++;
                 Console.WriteLine($"{i}. Exit Game");
@@ -129,6 +133,10 @@ namespace Backlog_Expedition
                     if (keypress > 0 && keypress <= availableRegions.Count)
                     {
                         OpenIsland(availableRegions[keypress - 1]);
+                    }
+                    else if (keypress == i - 2)
+                    {
+                        OpenHintShop();
                     }
                     else if (keypress == i - 1)
                     {
@@ -195,6 +203,71 @@ namespace Backlog_Expedition
                     else if (keypress == i)
                     {
                         onIsland = false;
+                    }
+                    else
+                    {
+                        ScreenHandler.PrintMessage("Invalid input! Press to try again", color: ConsoleColor.Yellow);
+                    }
+                }
+                else
+                {
+                    ScreenHandler.PrintMessage("Invalid input! Press to try again", color: ConsoleColor.Yellow);
+                }
+            }
+        }
+
+        private static void OpenHintShop()
+        {
+            bool inShop = true;
+            while (inShop && ConnectionHandler.Connected)
+            {
+                ScreenHandler.PrintHintShopScreen(ItemHandler.TrashAvailable);
+
+                int hintCost = (int)Math.Round(ItemHandler.TrashInWorld / 20.0, MidpointRounding.AwayFromZero);
+
+                Console.WriteLine($"1. Purchase Hint (Cost: {hintCost} trash)");
+                Console.WriteLine($"2. Return to Map");
+
+                string? selection = Console.ReadLine()?.Trim();
+
+                if (!ConnectionHandler.Connected)
+                {
+                    ScreenHandler.PrintDisconnectedScreen(["You have been disconnected from archipelago!", "The location has not been sent.", "Please log in again."]);
+                    inShop = false;
+                    continue;
+                }
+                else if (selection != null && int.TryParse(selection, out int keypress))
+                {
+                    if (keypress == 1)
+                    {
+                        if (ItemHandler.TrashAvailable >= hintCost)
+                        {
+                            List<long> alreadyHintedLocationIds = ConnectionHandler.GetHints()
+                                .Where(h => h.Status == HintStatus.Unspecified)
+                                .Select(h => h.LocationId)
+                                .ToList();
+
+                            List<Location> allLocations = RegionHandler.Regions
+                                .Where(r => r.Locations.Any())
+                                .SelectMany(r => r.Locations)
+                                .Where(loc => !alreadyHintedLocationIds.Contains(loc.Id))
+                                .ToList();
+
+                            Random rng = new Random();
+                            Location randomLocation = allLocations[rng.Next(allLocations.Count)];
+
+                            ConnectionHandler.SendLocationHint(randomLocation.Id);
+                            ItemHandler.UseTrash(hintCost);
+                            ScreenHandler.PrintHintScreen(randomLocation);
+                        }
+                        else
+                        {
+                            ScreenHandler.PrintMessage("You do not have enough trash to pay for this hint!", color: ConsoleColor.Yellow);
+                        }
+                    }
+                    else if (keypress == 2)
+                    {
+                        inShop = false;
                     }
                     else
                     {
