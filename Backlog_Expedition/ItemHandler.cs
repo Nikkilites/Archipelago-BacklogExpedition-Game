@@ -22,15 +22,17 @@ namespace Backlog_Expedition
         { 
             get
             {
-                return GameHandler.ConnectionHandler.GetServerDataStorage("trash_used");
+                return GameHandler.ConnectionHandler.GetServerDataStorage(trashServerDataStorageKey);
             }
             set
             {
-                GameHandler.ConnectionHandler.UpdateServerDataStorage("trash_used", value);
+                GameHandler.ConnectionHandler.UpdateServerDataStorage(trashServerDataStorageKey, value);
             }
         }
         public int TrashAvailable => trashAquired - trashUsed;
         public int TrashInWorld => GameHandler.ConnectionHandler.AllLocationsCount - GameHandler.RegionHandler.Regions.Count;
+
+        private string trashServerDataStorageKey = "";
 
         public void OnItemReceived(IReceivedItemsHelper helper)
         {
