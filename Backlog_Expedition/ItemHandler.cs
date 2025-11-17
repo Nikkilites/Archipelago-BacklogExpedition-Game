@@ -17,6 +17,20 @@ namespace Backlog_Expedition
                 _runes = value;
             }
         }
+        private int trashAquired = 0;
+        private int trashUsed 
+        { 
+            get
+            {
+                return GameHandler.ConnectionHandler.GetServerDataStorage("trash_used");
+            }
+            set
+            {
+                GameHandler.ConnectionHandler.UpdateServerDataStorage("trash_used", value);
+            }
+        }
+        public int TrashAvailable => trashAquired - trashUsed;
+        public int TrashInWorld => GameHandler.ConnectionHandler.AllLocationsCount - GameHandler.RegionHandler.Regions.Count;
 
         public void OnItemReceived(IReceivedItemsHelper helper)
         {
@@ -50,11 +64,21 @@ namespace Backlog_Expedition
 
         private void GiveItem(string item)
         {
-            if (item.EndsWith("Rune"))
+            if (item.EndsWith("Rune") && !item.StartsWith("Broken"))
             {
                 AvailableRunes.Add(item);
-                HelperMethods.Log($"Processed item with name: {item}");
             }
+            else
+            {
+                trashAquired++;
+            }
+            HelperMethods.Log($"Processed item with name: {item}");
+        }
+
+        public void UseTrash(int amount)
+        {
+            HelperMethods.Log($"Bought hint with {amount} trash items");
+            trashUsed = trashUsed + amount;
         }
     }
 }

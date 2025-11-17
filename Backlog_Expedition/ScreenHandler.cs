@@ -110,13 +110,49 @@ namespace Backlog_Expedition
             PrintAsciisHorizontally(LoadMultipleArtFiles(filenames), true, 7);
         }
 
+        public static void PrintHintShopScreen(int trashAvailable)
+        {
+            HelperMethods.Log("Printing Hint Shop Screen");
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            PrintAscii("hint_shop", true);
+            Console.WriteLine();
+            Console.ResetColor();
+
+            PrintMessages([$"You have {trashAvailable} pieces of trash available."], true, false, false, color: ConsoleColor.DarkYellow);
+        }
+
+        public static void PrintHintScreen(Location location)
+        {
+            Console.Clear();
+
+            ConsoleColor color = ConsoleColor.White;
+            switch (location.ScoutedInfo.Flags)
+            {
+                case ItemFlags.Advancement:
+                    color = ConsoleColor.Magenta;
+                    break;
+                case ItemFlags.NeverExclude:
+                    color = ConsoleColor.Cyan;
+                    break;
+                case ItemFlags.Trap:
+                    color = ConsoleColor.Red;
+                    break;
+                default:
+                    color = ConsoleColor.Gray;
+                    break;
+            }
+            Console.ForegroundColor = color;
+
+            PrintAscii("archipelago_medium", true);
+            Console.WriteLine();
+
+            PrintMessages(["Hint was purchased!", $"{location.ScoutedInfo.Player.Name}'s {location.ScoutedInfo.ItemName} is behind {location.Name}"], clear: false, color: color);
+        }
+
         public static void PrintLocationScreen(Location location, Dictionary<string, string> descriptions)
         {
             Console.Clear();
-            Console.ForegroundColor = ConsoleColor.Blue;
-            PrintAscii("archipelago_large", true);
-            Console.WriteLine();
-            Console.ResetColor();
 
             string message = "";
 
@@ -141,6 +177,10 @@ namespace Backlog_Expedition
                     color = ConsoleColor.Gray;
                     break;
             }
+            Console.ForegroundColor = color;
+
+            PrintAscii("archipelago_medium", true);
+            Console.WriteLine();
 
             PrintMessage(message
                 .Replace("ENTITY", location.EntityName)

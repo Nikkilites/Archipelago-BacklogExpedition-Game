@@ -86,7 +86,7 @@ namespace Backlog_Expedition.Archipelago
                 return;
             }
 
-            HelperMethods.Log($"Sending {apId} location to server");
+            HelperMethods.Log($"Sending location with id: {apId} to server");
 
             await session.Locations.CompleteLocationChecksAsync(apId);
 
@@ -102,7 +102,7 @@ namespace Backlog_Expedition.Archipelago
 
             long[] apIds = [.. locations.Select(x => session.Locations.GetLocationIdFromName(gameName, x))];
 
-            HelperMethods.Log($"Sending {string.Join(", ", apIds)} locations to server.");
+            HelperMethods.Log($"Sending locations with ids: {string.Join(", ", apIds)} to server.");
 
             await session.Locations.CompleteLocationChecksAsync(apIds);
 
@@ -122,6 +122,7 @@ namespace Backlog_Expedition.Archipelago
         }
 
         public ReadOnlyCollection<long> GetLocationsChecked() => session.Locations.AllLocationsChecked;
+        public int AllLocationsCount => session.Locations.AllLocations.Count;
 
         public string GetPlayerNameFromSlot(int slot)
         {
@@ -137,9 +138,32 @@ namespace Backlog_Expedition.Archipelago
         {
             return session.Locations.GetLocationNameFromId(id) ?? $"Location[{id}]";
         }
+
+        public void SendLocationHint(long id)
+        {
+            HelperMethods.Log($"Send location hint for location with id: {id} to server");
+            session.Hints.CreateHints(HintStatus.Unspecified, id);
+        }
+
+        public Hint[] GetHints()
+        {
+            return session.Hints.GetHints();
+        }
+
         public async Task<Dictionary<long, ScoutedItemInfo>> ScoutLocations(long[] ids)
         {
             return await session.Locations.ScoutLocationsAsync(ids);
+        }
+
+        internal int GetServerDataStorage(string key)
+        {
+            return session.DataStorage[key];
+        }
+
+        internal void UpdateServerDataStorage(string key, int value)
+        {
+            HelperMethods.Log($"Update Server Data Storage {key} to {value}");
+            session.DataStorage[key] = value;
         }
     }
 }
