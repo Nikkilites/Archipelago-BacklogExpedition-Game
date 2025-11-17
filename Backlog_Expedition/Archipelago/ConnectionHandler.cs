@@ -137,6 +137,18 @@ namespace Backlog_Expedition.Archipelago
         {
             return session.Locations.GetLocationNameFromId(id) ?? $"Location[{id}]";
         }
+
+        public void SendLocationHint(long id)
+        {
+            HelperMethods.Log($"Send location hint for location with id: {id} to server");
+            session.Hints.CreateHints(HintStatus.Unspecified, id);
+        }
+
+        public Hint[] GetHints()
+        {
+            return session.Hints.GetHints();
+        }
+
         public async Task<Dictionary<long, ScoutedItemInfo>> ScoutLocations(long[] ids)
         {
             return await session.Locations.ScoutLocationsAsync(ids);
