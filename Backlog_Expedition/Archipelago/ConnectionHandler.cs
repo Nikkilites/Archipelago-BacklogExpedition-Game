@@ -86,7 +86,7 @@ namespace Backlog_Expedition.Archipelago
                 return;
             }
 
-            HelperMethods.Log($"Sending {apId} location to server");
+            HelperMethods.Log($"Sending location with id: {apId} to server");
 
             await session.Locations.CompleteLocationChecksAsync(apId);
 
@@ -102,7 +102,7 @@ namespace Backlog_Expedition.Archipelago
 
             long[] apIds = [.. locations.Select(x => session.Locations.GetLocationIdFromName(gameName, x))];
 
-            HelperMethods.Log($"Sending {string.Join(", ", apIds)} locations to server.");
+            HelperMethods.Log($"Sending locations with ids: {string.Join(", ", apIds)} to server.");
 
             await session.Locations.CompleteLocationChecksAsync(apIds);
 
