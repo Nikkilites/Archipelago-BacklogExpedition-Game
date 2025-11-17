@@ -124,7 +124,17 @@ namespace Backlog_Expedition.Archipelago
         public ReadOnlyCollection<long> GetLocationsChecked() => session.Locations.AllLocationsChecked;
         public int AllLocationsCount => session.Locations.AllLocations.Count;
 
+        public int GetThisSlotId()
+        {
+            return session.ConnectionInfo.Slot;
+        }
+
         public string GetPlayerNameFromSlot(int slot)
+        {
+            return session.Players.GetPlayerName(slot) ?? "Server";
+        }
+
+        public string GetPlayerAliasFromSlot(int slot)
         {
             return session.Players.GetPlayerAlias(slot) ?? "Server";
         }
