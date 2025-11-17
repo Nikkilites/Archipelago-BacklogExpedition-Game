@@ -177,6 +177,10 @@ namespace Backlog_Expedition
                     color = ConsoleColor.Gray;
                     break;
             }
+            Console.ForegroundColor = color;
+
+            PrintAscii("archipelago_medium", true);
+            Console.WriteLine();
 
             PrintMessage(message
                 .Replace("ENTITY", location.EntityName)
