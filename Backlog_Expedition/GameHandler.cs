@@ -226,6 +226,8 @@ namespace Backlog_Expedition
                 ScreenHandler.PrintHintShopScreen(ItemHandler.TrashAvailable);
 
                 int hintCost = (int)Math.Round(ItemHandler.TrashInWorld / 20.0, MidpointRounding.AwayFromZero);
+                if (hintCost <= 1)
+                    hintCost = 1;
 
                 Console.WriteLine($"1. Purchase Hint (Cost: {hintCost} trash)");
                 Console.WriteLine($"2. Return to Map");
@@ -255,12 +257,19 @@ namespace Backlog_Expedition
                                 .Where(loc => !alreadyHintedLocationIds.Contains(loc.Id))
                                 .ToList();
 
-                            Random rng = new Random();
-                            Location randomLocation = allLocations[rng.Next(allLocations.Count)];
+                            if (allLocations.Count > 0)
+                            {
+                                Random rng = new Random();
+                                Location randomLocation = allLocations[rng.Next(allLocations.Count)];
 
-                            ConnectionHandler.SendLocationHint(randomLocation.Id);
-                            ItemHandler.UseTrash(hintCost);
-                            ScreenHandler.PrintHintScreen(randomLocation);
+                                ConnectionHandler.SendLocationHint(randomLocation.Id);
+                                ItemHandler.UseTrash(hintCost);
+                                ScreenHandler.PrintHintScreen(randomLocation);
+                            }
+                            else
+                            {
+                                ScreenHandler.PrintMessage("You have no unhinted locations to hint!", color: ConsoleColor.Yellow);
+                            }
                         }
                         else
                         {
