@@ -82,5 +82,14 @@ namespace Backlog_Expedition
             HelperMethods.Log($"Bought hint with {amount} trash items");
             trashUsed = trashUsed + amount;
         }
+
+        public void SetupItemHandler()
+        {
+            int slotId = GameHandler.ConnectionHandler.GetThisSlotId();
+            string slotName = GameHandler.ConnectionHandler.GetPlayerNameFromSlot(slotId);
+            string key = $"BEx_slot:{slotId}_{slotName}:trash_used";
+            HelperMethods.Log($"TrashServerDataStorageKey is: {key}");
+            trashServerDataStorageKey = key;
+        }
     }
 }
