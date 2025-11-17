@@ -257,12 +257,19 @@ namespace Backlog_Expedition
                                 .Where(loc => !alreadyHintedLocationIds.Contains(loc.Id))
                                 .ToList();
 
-                            Random rng = new Random();
-                            Location randomLocation = allLocations[rng.Next(allLocations.Count)];
+                            if (allLocations.Count > 0)
+                            {
+                                Random rng = new Random();
+                                Location randomLocation = allLocations[rng.Next(allLocations.Count)];
 
-                            ConnectionHandler.SendLocationHint(randomLocation.Id);
-                            ItemHandler.UseTrash(hintCost);
-                            ScreenHandler.PrintHintScreen(randomLocation);
+                                ConnectionHandler.SendLocationHint(randomLocation.Id);
+                                ItemHandler.UseTrash(hintCost);
+                                ScreenHandler.PrintHintScreen(randomLocation);
+                            }
+                            else
+                            {
+                                ScreenHandler.PrintMessage("You have no unhinted locations to hint!", color: ConsoleColor.Yellow);
+                            }
                         }
                         else
                         {
