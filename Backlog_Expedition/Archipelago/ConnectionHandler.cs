@@ -124,7 +124,17 @@ namespace Backlog_Expedition.Archipelago
         public ReadOnlyCollection<long> GetLocationsChecked() => session.Locations.AllLocationsChecked;
         public int AllLocationsCount => session.Locations.AllLocations.Count;
 
+        public int GetThisSlotId()
+        {
+            return session.ConnectionInfo.Slot;
+        }
+
         public string GetPlayerNameFromSlot(int slot)
+        {
+            return session.Players.GetPlayerName(slot) ?? "Server";
+        }
+
+        public string GetPlayerAliasFromSlot(int slot)
         {
             return session.Players.GetPlayerAlias(slot) ?? "Server";
         }
@@ -155,12 +165,12 @@ namespace Backlog_Expedition.Archipelago
             return await session.Locations.ScoutLocationsAsync(ids);
         }
 
-        internal int GetServerDataStorage(string key)
+        public int GetServerDataStorage(string key)
         {
             return session.DataStorage[key];
         }
 
-        internal void UpdateServerDataStorage(string key, int value)
+        public void UpdateServerDataStorage(string key, int value)
         {
             HelperMethods.Log($"Update Server Data Storage {key} to {value}");
             session.DataStorage[key] = value;

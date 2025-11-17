@@ -22,15 +22,17 @@ namespace Backlog_Expedition
         { 
             get
             {
-                return GameHandler.ConnectionHandler.GetServerDataStorage("trash_used");
+                return GameHandler.ConnectionHandler.GetServerDataStorage(trashServerDataStorageKey);
             }
             set
             {
-                GameHandler.ConnectionHandler.UpdateServerDataStorage("trash_used", value);
+                GameHandler.ConnectionHandler.UpdateServerDataStorage(trashServerDataStorageKey, value);
             }
         }
         public int TrashAvailable => trashAquired - trashUsed;
         public int TrashInWorld => GameHandler.ConnectionHandler.AllLocationsCount - GameHandler.RegionHandler.Regions.Count;
+
+        private string trashServerDataStorageKey = "";
 
         public void OnItemReceived(IReceivedItemsHelper helper)
         {
@@ -79,6 +81,15 @@ namespace Backlog_Expedition
         {
             HelperMethods.Log($"Bought hint with {amount} trash items");
             trashUsed = trashUsed + amount;
+        }
+
+        public void SetupItemHandler()
+        {
+            int slotId = GameHandler.ConnectionHandler.GetThisSlotId();
+            string slotName = GameHandler.ConnectionHandler.GetPlayerNameFromSlot(slotId);
+            string key = $"BEx_slot:{slotId}_{slotName}:trash_used";
+            HelperMethods.Log($"TrashServerDataStorageKey is: {key}");
+            trashServerDataStorageKey = key;
         }
     }
 }

@@ -75,6 +75,8 @@ namespace Backlog_Expedition
 
                 RegionHandler.CreateRegions(slotData);
 
+                ItemHandler.SetupItemHandler();
+
                 ScreenHandler.PrintConnectedScreen("Successfully connected to Archipelago! Press any key to continue to the game");
 
                 ScreenHandler.PrintIntroScreen(DataStorageHandler.StoryData.introduction);
