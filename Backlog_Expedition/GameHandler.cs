@@ -17,9 +17,9 @@ namespace Backlog_Expedition
         {
             ConnectionHandler = new();
             RegionHandler = new();
+            DataStorageHandler = new();
             ItemHandler = new();
             GoalHandler = new();
-            DataStorageHandler = new();
         }
 
         public async void StartGame()
