@@ -92,7 +92,9 @@ namespace Backlog_Expedition
             {
                 List<Region> availableRegions = [.. RegionHandler.Regions.Where(r => r.RuneReceived == true)];
 
-                ScreenHandler.PrintMainScreen(availableRegions, GoalHandler);
+                List<Region> regionsWithARune = [.. RegionHandler.Regions.Where(r => r.RuneCount >= 1)];
+
+                ScreenHandler.PrintMainScreen(regionsWithARune, GoalHandler);
 
                 int i = 1;
 
