@@ -65,10 +65,12 @@ namespace Backlog_Expedition.Archipelago
         {
             if (Connected)
             {
-                Connected = false;
-                session = null;
+                reason += $"\n    Called from OnDisconnect";
                 HelperMethods.Log($"Disconnected {reason}");
-                Updater.Stop();
+
+                ScreenHandler.PrintMessage($"The game disconnected from the server. Please reopen the game and check the DebugLog for details if needed.", color: ConsoleColor.Red);
+
+                Environment.Exit(0);
             }
         }
 
@@ -76,7 +78,10 @@ namespace Backlog_Expedition.Archipelago
         {
             message += $"\n    Called from OnError";
             HelperMethods.Log($"Disconnected {message}");
-            throw e;
+
+            ScreenHandler.PrintMessage($"Unexpected error occured. Please reopen the game and check the DebugLog for details if needed.", color: ConsoleColor.Red);
+
+            Environment.Exit(0);
         }
 
         public async void SendLocation(long apId)
