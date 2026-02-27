@@ -71,6 +71,7 @@ namespace Backlog_Expedition
                 Dictionary<string, object> slotData = ConnectionHandler.SlotData;
 
                 GoalHandler.TreasuresToGoal = Convert.ToInt32(slotData["beaten_to_goal"]);
+                RegionHandler.RunesRequired = Convert.ToInt32(slotData["runes_required"]);
 
                 RegionHandler.CreateRegions(slotData);
 
