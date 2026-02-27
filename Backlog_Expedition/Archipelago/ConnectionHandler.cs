@@ -76,12 +76,15 @@ namespace Backlog_Expedition.Archipelago
 
         public void OnError(Exception e, string message)
         {
-            message += $"\n    Called from OnError";
-            HelperMethods.Log($"Disconnected {message}");
+            if (Connected)
+            {
+                message += $"\n    Called from OnError";
+                HelperMethods.Log($"Disconnected {message}");
 
-            ScreenHandler.PrintMessage($"Unexpected error occured. Please reopen the game and check the DebugLog for details if needed.", color: ConsoleColor.Red);
+                ScreenHandler.PrintMessage($"Unexpected error occured. Please reopen the game and check the DebugLog for details if needed.", color: ConsoleColor.Red);
 
-            Environment.Exit(0);
+                Environment.Exit(0);
+            }
         }
 
         public async void SendLocation(long apId)
