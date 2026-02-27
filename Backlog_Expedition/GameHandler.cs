@@ -1,5 +1,4 @@
 ﻿using Archipelago.MultiClient.Net.Enums;
-using Archipelago.MultiClient.Net.Models;
 using Backlog_Expedition.Archipelago;
 using Backlog_Expedition.Model;
 using System.Data;

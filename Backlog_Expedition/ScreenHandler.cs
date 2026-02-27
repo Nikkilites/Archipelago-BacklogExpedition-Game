@@ -1,6 +1,5 @@
 ﻿using Backlog_Expedition.Model;
 using Archipelago.MultiClient.Net.Enums;
-using System.Drawing;
 
 namespace Backlog_Expedition
 {
