@@ -8,6 +8,7 @@ namespace Backlog_Expedition
     public class RegionHandler
     {
         public List<Region> Regions { get; set; } = [];
+        public int RunesRequired { get; set; } = 0;
 
         public async Task CreateRegions(Dictionary<string, object> slotData)
         {

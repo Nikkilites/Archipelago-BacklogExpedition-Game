@@ -6,17 +6,7 @@ namespace Backlog_Expedition
     {
         private static readonly object itemLock = new();
         private readonly Queue<string> itemQueue = new();
-        private List<string> _runes = [];
-        public List<string> AvailableRunes { 
-            get
-            {
-                return _runes;
-            }
-            private set
-            {
-                _runes = value;
-            }
-        }
+        public Dictionary<string, int> AvailableRunes = new();
         private int trashAquired = 0;
         private int trashUsed 
         { 
@@ -33,6 +23,14 @@ namespace Backlog_Expedition
         public int TrashInWorld => GameHandler.ConnectionHandler.AllLocationsCount - GameHandler.RegionHandler.Regions.Count;
 
         private string trashServerDataStorageKey = "";
+
+        public ItemHandler()
+        {
+            foreach (string region in GameHandler.DataStorageHandler.Regions)
+            {
+                AvailableRunes.Add($"{region} Rune", 0);
+            }
+        }
 
         public void OnItemReceived(IReceivedItemsHelper helper)
         {
@@ -68,7 +66,7 @@ namespace Backlog_Expedition
         {
             if (item.EndsWith("Rune") && !item.StartsWith("Broken"))
             {
-                AvailableRunes.Add(item);
+                AvailableRunes[item]++;
             }
             else
             {

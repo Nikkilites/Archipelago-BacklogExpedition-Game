@@ -1,6 +1,5 @@
 ﻿using Backlog_Expedition.Model;
 using Archipelago.MultiClient.Net.Enums;
-using System.Drawing;
 
 namespace Backlog_Expedition
 {
@@ -53,7 +52,7 @@ namespace Backlog_Expedition
             PrintMessages(messages, true, false, true, color: ConsoleColor.White);
         }
 
-        public static void PrintMainScreen(List<Region> availableRegions, GoalHandler goalHandler)
+        public static void PrintMainScreen(List<Region> regionsWithARune, GoalHandler goalHandler)
         {
             HelperMethods.Log("Printing Main Screen");
 
@@ -61,9 +60,11 @@ namespace Backlog_Expedition
             PrintMessage($"Treasures found: {goalHandler.TreasuresFound}/{goalHandler.TreasuresToGoal}", wait: false);
             Console.WriteLine();
 
-            List<string> runeFileNames = [.. availableRegions.Where(r => r.Name != "Starting").Select(r => r.RuneAsciiFileNameWText)];
+            List<Region> filteredRegions = regionsWithARune
+                .Where(r => r.Name != "Starting")
+                .ToList();
 
-            if (runeFileNames.Count == 0)
+            if (filteredRegions.Count == 0)
             {
                 Console.ForegroundColor = ConsoleColor.Gray;
                 PrintMessage("You do not have any runes.", clear: false, wait: false);
@@ -71,11 +72,18 @@ namespace Backlog_Expedition
             }
             else
             {
-                List<string[]> Arts = LoadMultipleArtFiles(runeFileNames);
+                List<List<string>> Arts = LoadMultipleArtFiles(filteredRegions.Select(r => r.RuneAsciiFileNameWText).ToList());
+
+                for (int i = 0; i < Arts.Count; i++)
+                {
+                    var region = filteredRegions[i];
+                    Arts[i].Add($"       ({region.RuneCount}/{GameHandler.RegionHandler.RunesRequired})       ");
+                }
 
                 Console.ForegroundColor = ConsoleColor.Blue;
                 PrintAsciisHorizontally(Arts, true, 7);
             }
+
             Console.ResetColor();
             Console.WriteLine();
         }
@@ -256,15 +264,15 @@ namespace Backlog_Expedition
                 Console.ReadKey(true);
         }
 
-        private static List<string[]> LoadMultipleArtFiles(List<string> runeFileNames)
+        private static List<List<string>> LoadMultipleArtFiles(List<string> runeFileNames)
         {
-            List<string[]> asciiArts = [];
+            List<List<string>> asciiArts = [];
 
             foreach (var filename in runeFileNames)
             {
                 LoadArtFile(filename, out string filePath);
 
-                asciiArts.Add(File.ReadAllLines(filePath));
+                asciiArts.Add(File.ReadAllLines(filePath).ToList());
             }
 
             return asciiArts;
@@ -294,7 +302,7 @@ namespace Backlog_Expedition
             }
         }
 
-        private static void PrintAsciisHorizontally(List<string[]> asciiArts, bool center, int maxPerLine)
+        private static void PrintAsciisHorizontally(List<List<string>> asciiArts, bool center, int maxPerLine)
         {
             int spacing = 4;
             string spacer = new(' ', spacing);
@@ -303,16 +311,16 @@ namespace Backlog_Expedition
             {
                 var batch = asciiArts.Skip(batchStart).Take(maxPerLine).ToList();
 
-                // Aligns bottoms by adding top padding
-                int maxHeight = batch.Max(a => a.Length);
+                int maxHeight = batch.Max(a => a.Count);
+
                 for (int i = 0; i < batch.Count; i++)
                 {
-                    if (batch[i].Length < maxHeight)
+                    if (batch[i].Count < maxHeight)
                     {
-                        int padLines = maxHeight - batch[i].Length;
-                        var padded = new List<string>(Enumerable.Repeat("", padLines));
+                        int padLines = maxHeight - batch[i].Count;
+                        var padded = Enumerable.Repeat("", padLines).ToList();
                         padded.AddRange(batch[i]);
-                        batch[i] = [.. padded];
+                        batch[i] = padded;
                     }
                 }
 

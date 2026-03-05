@@ -1,5 +1,4 @@
 ﻿using Archipelago.MultiClient.Net.Enums;
-using Archipelago.MultiClient.Net.Models;
 using Backlog_Expedition.Archipelago;
 using Backlog_Expedition.Model;
 using System.Data;
@@ -18,9 +17,9 @@ namespace Backlog_Expedition
         {
             ConnectionHandler = new();
             RegionHandler = new();
+            DataStorageHandler = new();
             ItemHandler = new();
             GoalHandler = new();
-            DataStorageHandler = new();
         }
 
         public async void StartGame()
@@ -33,31 +32,53 @@ namespace Backlog_Expedition
                 while (!ConnectionHandler.Connected)
                 {
                     ScreenHandler.PrintLoginScreen(DataStorageHandler.StoryData.login);
-                    try
-                    {
-                        Console.ResetColor();
 
+                    Console.ResetColor();
+
+                    RoomInfoData room = SaveDataHandler.RoomInfo;
+
+                    string? server = room.Server;
+                    string? player = room.Playername;
+                    string? pass = room.Password;
+
+                    string input = "N";
+
+                    if (player != null && player != "")
+                    {
+                        Console.Write("Use previous login? (Y/N): ");
+                        input = Console.ReadLine()?.Trim().ToUpper();
+                    }
+
+                    if (input == "N")
+                    {
                         Console.WriteLine("Server: ");
-                        string? server = Console.ReadLine()?.Trim();
+                        server = Console.ReadLine()?.Trim();
 
                         Console.WriteLine("Player: ");
-                        string? player = Console.ReadLine()?.Trim();
+                        player = Console.ReadLine()?.Trim();
 
                         Console.WriteLine("Password (optional): ");
-                        string? pass = Console.ReadLine()?.Trim();
+                        pass = Console.ReadLine()?.Trim();
                         pass ??= string.Empty;
-
                         if (string.IsNullOrWhiteSpace(server) || string.IsNullOrWhiteSpace(player))
                         {
                             ScreenHandler.PrintMessage("Server and Player fields are required. Press any key to try again.", color: ConsoleColor.Yellow);
                             continue;
                         }
+                    }
+                    else if (input != "Y")
+                    {
+                        ScreenHandler.PrintMessage("Invalid input. Please enter Y or N. Press any key to try again.", color: ConsoleColor.Red);
+                        continue;
+                    }
 
+                    try
+                    {
                         bool success = ConnectionHandler.Connect(server, player, pass);
 
                         if (!success)
                         {
-                            ScreenHandler.PrintMessage("Connection failed. Press any key to try again.", color: ConsoleColor.Red);
+                            ScreenHandler.PrintMessage("Connection failed. Please check if the server is up, and your login info. Press any key to try again.", color: ConsoleColor.Red);
                             continue;
                         }
 
@@ -66,12 +87,16 @@ namespace Backlog_Expedition
                     catch (Exception ex)
                     {
                         ScreenHandler.PrintMessage($"Unexpected error while connecting:\n{ex.Message}\nPress any key to try again.", color: ConsoleColor.Red);
+                        continue;
                     }
+
+                    SaveDataHandler.SaveRoomInfo(server, player, pass);
                 }
 
                 Dictionary<string, object> slotData = ConnectionHandler.SlotData;
 
                 GoalHandler.TreasuresToGoal = Convert.ToInt32(slotData["beaten_to_goal"]);
+                RegionHandler.RunesRequired = Convert.ToInt32(slotData["runes_required"]);
 
                 RegionHandler.CreateRegions(slotData);
 
@@ -92,7 +117,9 @@ namespace Backlog_Expedition
             {
                 List<Region> availableRegions = [.. RegionHandler.Regions.Where(r => r.RuneReceived == true)];
 
-                ScreenHandler.PrintMainScreen(availableRegions, GoalHandler);
+                List<Region> regionsWithARune = [.. RegionHandler.Regions.Where(r => r.RuneCount >= 1)];
+
+                ScreenHandler.PrintMainScreen(regionsWithARune, GoalHandler);
 
                 int i = 1;
 
