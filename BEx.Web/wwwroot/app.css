@@ -168,3 +168,20 @@ h1:focus {
     font-size: 0.9em;
     color: gray;
 }
+
+
+/* Top row styling to match layout appearance */
+.connected-row {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    margin-bottom: 1rem;
+    background-color: #f8f9fa; /* light gray similar to typical header */
+    border-bottom: 1px solid #dee2e6;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+    .connected-row .text {
+        font-weight: 500;
+        font-size: 1.1rem;
+    }
