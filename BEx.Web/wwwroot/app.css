@@ -60,17 +60,21 @@ h1:focus {
     font-size: 16px;
     cursor: pointer;
     border: 1px solid #ccc;
-    border-radius: 4px;
-    background: #f5f5f5;
+    border-radius: 5px;
+    background: #73bfeb;
 }
 
-.button:hover {
-    background: #e8e8e8;
-}
+    .button:hover {
+        background: #7acce2;
+    }
 
-.button:active {
-    background: #ddd;
-}
+    .button:active {
+        background: #ddd;
+    }
+
+    .button:disabled {
+        background: #ddd;
+    }
 
 .button-small {
     padding: 4px 10px;
@@ -86,40 +90,53 @@ h1:focus {
 
 .app-layout {
     display: flex;
+    padding: 15px;
 }
 
-/* LEFT SIDE */
 
-.region-sidebar {
-    width: 220px;
+
+.game-sidebar {
+    width: 250px;
     background: #f2f2f2;
     padding: 15px;
     display: flex;
     flex-direction: column;
     gap: 8px;
+    border: 1px solid #dee2e6;
+    background: #e8f4ff;
+    border-radius: 8px;
 }
 
 /* region names */
 
-.region-item {
+.game-item {
     cursor: pointer;
     padding: 6px 8px;
 }
 
-.region-item:hover {
-    background: #e6e6e6;
+    .game-item:hover {
+        background: #80b9ea;
+    }
+
+.game-item-active {
+    font-weight: 600;
+    margin-left: 10px;
 }
 
-.region-active {
-    font-weight: 600;
+.game-item-finished {
+    text-decoration: line-through;
+    text-decoration-thickness: 2px;
 }
 
 .login-container {
     max-width: 350px;
     margin: 40px auto;
+    padding: 20px;
     display: flex;
     flex-direction: column;
     gap: 15px;
+    background: #e8f4ff;
+    border-radius: 8px;
 }
 
 .form-group {
@@ -135,24 +152,17 @@ h1:focus {
 
 .regions-container {
     flex: 1;
-    padding-left: 30px;
-    max-width: 700px;
-    margin: 40px auto;
+    padding-left: 20px;
     display: flex;
     flex-direction: column;
     gap: 20px;
-}
-
-.region-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
 }
 
 .location-list {
     display: flex;
     align-items: flex-start;
     gap: 10px;
+    align-items: center;
 }
 
 .text {
@@ -165,7 +175,7 @@ h1:focus {
 }
 
 .location-hint {
-    font-size: 0.9em;
+    font-size: 1em;
     color: gray;
 }
 
@@ -174,8 +184,7 @@ h1:focus {
 .connected-row {
     padding-top: 0.75rem;
     padding-bottom: 0.75rem;
-    margin-bottom: 1rem;
-    background-color: #f8f9fa; /* light gray similar to typical header */
+    background-color: #f8f9fa;
     border-bottom: 1px solid #dee2e6;
     width: 100%;
     box-sizing: border-box;
@@ -183,5 +192,111 @@ h1:focus {
 
     .connected-row .text {
         font-weight: 500;
-        font-size: 1.1rem;
     }
+
+    .connected-row .title-text {
+        font-weight: 500;
+        font-size: 1.5rem;
+    }
+
+
+
+.home-container {
+    padding-left: 20px;
+}
+
+    .home-container .text {
+        display: flex;
+        flex-direction: column;
+        padding-bottom: 0.75rem;
+    }
+
+.icon-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 30px;
+    margin-top: 30px;
+    align-items: center;
+}
+
+.icon-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+}
+
+.icon-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 150px;
+    text-align: center;
+}
+
+.icon-title {
+    margin-top: 6px;
+    font-weight: 600;
+}
+
+.icon-subtitle {
+    font-size: 0.9rem;
+    color: #888;
+}
+
+h2 {
+    margin: 0;
+}
+
+.notification-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    /* Prevent stretching children */
+    align-items: flex-end;
+    z-index: 1000;
+}
+
+.notification-overlay {
+    background: #e8f4ff;
+    color: black;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+
+    display: inline-flex; /* <-- changed from default block */
+    align-items: center; /* vertically center the dot and text */
+    gap: 8px; /* space between dot and message */
+
+    width: auto;
+    max-width: 1000px; /* optional limit so super long messages don’t explode layout */
+    text-align: right; /* optional, keeps the text neat on the right side */
+
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+    .notification-overlay.fade-out {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+.notification-dot {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.shop-image {
+    width: 500px;
+    height: 400px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    object-fit: cover;
+}

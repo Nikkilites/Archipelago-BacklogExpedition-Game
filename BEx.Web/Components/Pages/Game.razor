@@ -1,97 +1,262 @@
 ﻿@page "/connected/{PlayerName}"
+@rendermode InteractiveServer
+
+<PageTitle>BEx</PageTitle>
 
 <div class="connected-row px-4">
+    <div class="title-text">Backlog Expedition</div>
     <div class="text">Welcome @PlayerName, you have been connected to Archipelago!</div>
 </div>
 
+
 <div class="app-layout">
 
-    <div class="region-sidebar">
+    <div class="notification-container">
+        @foreach (var note in Notifications)
+        {
+            <div class="notification-overlay @(note.IsFading ? "fade-out" : "")" key="@note.Id">
+                <span class="notification-dot" style="background-color:@note.DotColor"></span>
+                @note.Message
+            </div>
+        }
+    </div>
+
+    <div class="game-sidebar">
+
+        <div class="game-item @("Home" == SelectedSidebarItem ? "game-item-active" : "")"
+        @onclick='() => SelectedSidebarItem = "Home"'>
+            Home
+        </div>
+
+        <div class="game-item @("Shop" == SelectedSidebarItem ? "game-item-active" : "")"
+        @onclick='() => SelectedSidebarItem = "Shop"'>
+            Trash Shop
+        </div>
+
         @foreach (var region in Regions)
         {
-            <div class="region-item @(region == SelectedRegion ? "region-active" : "")"
-                 @onclick="() => SelectedRegion = region">
+            <div class="game-item @(region.Name == SelectedSidebarItem ? "game-item-active" : "") @(region.Locations.Count == 0 ? "game-item-finished" : "") "
+            @onclick="() => SelectedSidebarItem = region.Name">
                 @region.Name
             </div>
         }
     </div>
 
-    <div class="regions-container">
+    @if (SelectedSidebarItem == "Home")
+    {
+        <div class="home-container">
 
-        @if (SelectedRegion != null)
-        {
-            <h2>@SelectedRegion.Name</h2>
+            <h2>Treasure</h2>
+            <h5>Treasures found: 2/5</h5>
 
-            @foreach (var location in SelectedRegion.Locations)
-            {
-                <div class="location-list">
-
-                    <input type="checkbox" />
-
-                    @*                     <button class="button button-small" @onclick="SendCheck(location)">Send Check</button> *@
-
-                    <div class="text">
-                        <div class="location-name">@location.Name</div>
-                        <div class="location-hint">@location.Hint</div>
+            <div class="icon-grid">
+                @foreach (var icon in TreasureIcons)
+                {
+                    <div class="icon-item">
+                        <img src="@icon.ImageUrl" title="@icon.Name" class="icon-image" />
+                        <div class="icon-title">@icon.Name</div>
+                        <div class="icon-subtitle">@icon.Name island</div>
                     </div>
+                }
+            </div>
 
-                </div>
+            <h2>Runes</h2>
+
+            <div class="icon-grid">
+                @foreach (var icon in RuneIcons)
+                {
+                    <div class="icon-item">
+                        <img src="@icon.ImageUrl" title="@icon.Name" class="icon-image" />
+
+                        <div class="icon-title">@icon.Name</div>
+                        <div class="icon-subtitle">(2/2)</div>
+                    </div>
+                }
+            </div>
+
+        </div>
+    }
+    else if (SelectedSidebarItem == "Shop")
+    {
+        <div class="home-container">
+
+            <h2>Trash Shop</h2>
+
+            <img src="https://bostonglobe-prod.cdn.arcpublishing.com/resizer/v2/TBUSCWYXI5DZ5MO4J7ZDV2WORQ.jpg?auth=1b5466bcd0d5446a0fb52291c9fc927b3ce9ac027831a30ea65af6e36542072f&width=1440" title="Trash Panda" class="shop-image" />
+
+            <h5>Trash required: 10/12</h5>
+
+            <button class="button" @onclick="SendHint">
+                Purchase Hint
+            </button>
+        </div>
+    }
+    else
+    {
+        <div class="regions-container">
+
+            @if (SelectedSidebarItem != null)
+            {
+                <h2>@SelectedSidebarItem</h2>
+
+                Region region = Regions.FirstOrDefault(r => r.Name == SelectedSidebarItem);
+
+                if (region.Locations.Count == 0)
+                {
+                    <h5>This island has been fully raided!</h5>
+                }
+                else
+                {
+                    @foreach(var location in region.Locations)
+                    {
+                        <div class="location-list">
+
+                            <input type="checkbox" @bind="location.IsChecked" />
+
+                            <button class="button button-small" @onclick="() => SendCheck(location)" disabled="@( !location.IsChecked )">
+                                Send
+                            </button>
+
+                            <div class="text">
+                                <div class="location-name">@location.Name</div>
+                                <div class="location-hint">@location.Hint</div>
+                            </div>
+
+                        </div>
+                    }
+                }
             }
-        }
-
-    </div>
+        </div>
+    }
 
 </div>
 
 @code {
-
-    Region? SelectedRegion;
-
-    protected override void OnInitialized()
-    {
-        SelectedRegion = Regions.FirstOrDefault();
-    }
+    string? SelectedSidebarItem = "Home";
 
     [Parameter]
     public string? PlayerName { get; set; }
 
-    public class Location()
+    public class Location
     {
-        public string Name;
-        public int Id;
-        public string Hint;
+        // NEW: Track if this location is checked
+        public bool IsChecked { get; set; } = false;
+
+        public string Name { get; set; }
+        public int Id { get; set; }
+        public string Hint { get; set; }
     }
 
-    public class Region()
+    public class Region
     {
-        public string Name;
-        public List<Location> Locations;
+        public string Name { get; set; } = "";
+        public List<Location> Locations { get; set; } = new();
     }
+
+    public class Icon
+    {
+        public string Name { get; set; }
+        public string ImageUrl { get; set; }
+    }
+
 
     List<Region> Regions = new()
     {
         new() { Name="Gemstone Island", Locations=new()
             {
-                new() { Name="Opened the Fragile Sarcophagus in Candy Island", Hint="Take optional photo #8 in Episode 3 of LiS" },
+                new() { Name="Opened the Useful Sarcophagus in Candy Island", Hint="Take optional photo #8 in Episode 3 of LiS" },
                 new() { Name="Opened the Obsidian Chest in Candy Island", Hint="Clear a level of Train Valley 2" }
             }
         },
         new() { Name="Desert Island", Locations=new()
             {
-                new() { Name="Slay the Draugr in Desert Island", Hint="Complete a hour of Broken Age" },
-                new() { Name="Opened the Silver Barrel in Desert Island", Hint="Find Pixel Toad in Captain Toad, Episode 3 Level 16" }
+                new() { Name="Slay the Progression in Desert Island", Hint="Complete a hour of Broken Age" },
+                new() { Name="Opened the Progression Barrel in Desert Island", Hint="Find Pixel Toad in Captain Toad, Episode 3 Level 16" }
             }
         },
         new() { Name="Candy Island", Locations=new()
             {
                 new() { Name="Opened the Fragile Sarcophagus in Candy Island", Hint="Take optional photo #8 in Episode 3 of LiS" },
-                new() { Name="Opened the Obsidian Chest in Candy Island", Hint="Clear a level of Train Valley 2" }
+                new() { Name="Opened the Trap Chest in Candy Island", Hint="Clear a level of Train Valley 2" }
             }
         }
     };
 
+    List<Icon> TreasureIcons = new()
+    {
+        new() { Name="Feather", ImageUrl="https://featherplace.com/cdn/shop/files/red-ostrich-feather-drabs-OP12LB--R-ALT1_8eb63759-bc85-4983-a28a-81493ab67646.jpg?v=1690218213&width=1445" },
+        new() { Name="Something", ImageUrl="https://pokalforum.dk/images/produkter/pokaler/2277-p.jpg" }
+    };
+
+    List<Icon> RuneIcons = new()
+    {
+        new() { Name="Gemstone Rune", ImageUrl="https://m.media-amazon.com/images/I/6164aBnzQLL._AC_UF1000,1000_QL80_.jpg" },
+        new() { Name="Candy Rune", ImageUrl="https://thumbs.dreamstime.com/b/swirl-lollipop-candy-round-shape-red-white-background-405125005.jpg" },
+        new() { Name="Desert Rune", ImageUrl="https://media.istockphoto.com/id/1296159259/photo/sand-circle-isolated-on-white-background.jpg?s=170667a&w=0&k=20&c=ANcbV57PPghjwRPp4PJ3NWlLNRJ338cadG1K7ujXONU=" }
+
+    };
+
+    public class Notification
+    {
+        public string Message { get; set; } = "";
+        public Guid Id { get; set; } = Guid.NewGuid();
+        public bool IsFading { get; set; } = false;
+        public string DotColor { get; set; } = "#00EEEE"; // default cyan
+    }
+
+    List<Notification> Notifications = new();
+
     void SendCheck(Location location)
     {
-        Console.WriteLine(location.Name);
+        var region = Regions.FirstOrDefault(r => r.Locations.Contains(location));
+        if (region != null)
+        {
+            region.Locations.Remove(location);
+            StateHasChanged();
+
+
+            string dotColor = "#00EEEE"; // default cyan
+            // Example logic for assigning color based on Name (you can use a proper Rarity property)
+            if (location.Name.Contains("Useful")) dotColor = "#6D8BE8";
+            else if (location.Name.Contains("Progression")) dotColor = "#AF99EF";
+            else if (location.Name.Contains("Trap")) dotColor = "#FA8072";
+
+            var notification = new Notification
+            {
+                Message = $"Item '{location.Name}' was sent to a player!",
+                DotColor = dotColor
+            };
+
+            _ = CreateNotification(notification);
+        }
+    }
+
+    void SendHint()
+    {
+        var notification = new Notification
+            {
+                Message = $"Hint sent!",
+                DotColor = "#00EEEE"
+            };
+
+        _ = CreateNotification(notification);
+    }
+
+
+    async Task CreateNotification(Notification notification)
+    {
+        Notifications.Add(notification);
+        StateHasChanged();
+
+        await Task.Delay(5000);
+
+        notification.IsFading = true;
+        StateHasChanged();
+
+        await Task.Delay(500);
+
+        Notifications.Remove(notification);
+        StateHasChanged();
+        }
     }
 }
