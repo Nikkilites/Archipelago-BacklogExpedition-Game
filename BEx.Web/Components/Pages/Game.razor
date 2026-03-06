@@ -14,9 +14,6 @@
 
     <div class="regions-container">
 
-        <h3>Connected</h3>
-        <p>Hello @PlayerName</p>
-
         @if (SelectedRegion != null)
         {
             <h2>@SelectedRegion.Name</h2>
@@ -25,11 +22,9 @@
             {
                 <div class="location-list">
 
-                    <input type="checkbox" @bind="location.IsChecked" />
+                    <input type="checkbox" />
 
-                    <button class="button button-small">
-                        Copy
-                    </button>
+                    @*                     <button class="button button-small" @onclick="SendCheck(location)">Send Check</button> *@
 
                     <div class="text">
                         <div class="location-name">@location.Name</div>
@@ -39,8 +34,6 @@
                 </div>
             }
         }
-
-        <button class="button" @onclick="SendChecks">Send Checks</button>
 
     </div>
 
@@ -63,7 +56,6 @@
         public string Name;
         public int Id;
         public string Hint;
-        public bool IsChecked { get; set; }
     }
 
     public class Region()
@@ -78,31 +70,24 @@
             {
                 new() { Name="Opened the Fragile Sarcophagus in Candy Island", Hint="Take optional photo #8 in Episode 3 of LiS" },
                 new() { Name="Opened the Obsidian Chest in Candy Island", Hint="Clear a level of Train Valley 2" }
-            } 
+            }
         },
         new() { Name="Desert Island", Locations=new()
             {
                 new() { Name="Slay the Draugr in Desert Island", Hint="Complete a hour of Broken Age" },
                 new() { Name="Opened the Silver Barrel in Desert Island", Hint="Find Pixel Toad in Captain Toad, Episode 3 Level 16" }
-            } 
+            }
         },
         new() { Name="Candy Island", Locations=new()
             {
                 new() { Name="Opened the Fragile Sarcophagus in Candy Island", Hint="Take optional photo #8 in Episode 3 of LiS" },
                 new() { Name="Opened the Obsidian Chest in Candy Island", Hint="Clear a level of Train Valley 2" }
-            } 
+            }
         }
     };
 
-    void SendChecks()
+    void SendCheck(Location location)
     {
-        var checkedItems = Regions
-            .SelectMany(r => r.Locations)
-            .Where(l => l.IsChecked);
-
-        foreach (var item in checkedItems)
-        {
-            Console.WriteLine(item.Name);
-        }
+        Console.WriteLine(location.Name);
     }
 }
