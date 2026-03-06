@@ -1,0 +1,43 @@
+﻿@page "/bex"
+@rendermode InteractiveServer
+@inject NavigationManager Nav
+
+<PageTitle>BEx</PageTitle>
+
+<div class="login-container">
+    <h2>BEx Login</h2>
+
+    <div class="form-group">
+        <label>Host and Port</label>
+        <input @bind="HostPort" class="form-control" placeholder="Example: archipelago.gg:12345" />
+    </div>
+
+    <div class="form-group">
+        <label>Player Name</label>
+        <input @bind="PlayerName" class="form-control" placeholder="Example: MyBExName" />
+    </div>
+
+    <div class="form-group">
+        <label>Password</label>
+        <input @bind="Password" type="password" class="form-control" placeholder="Leave blank if no password" />
+    </div>
+
+    <button class="button" @onclick="LoginAndConnect">
+        Login & Connect
+    </button>
+</div>
+
+@code {
+    string? HostPort = "";
+    string? PlayerName = "";
+    string? Password = "";
+
+    private void LoginAndConnect()
+    {
+        Console.WriteLine($"Host: {HostPort}");
+        Console.WriteLine($"Player: {PlayerName}");
+        Console.WriteLine($"Password: {Password}");
+
+        Nav.NavigateTo($"/bex/{PlayerName}");
+    }
+}

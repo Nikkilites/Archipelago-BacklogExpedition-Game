@@ -1,0 +1,108 @@
+﻿@page "/bex/{PlayerName}"
+
+<div class="app-layout">
+
+    <div class="region-sidebar">
+        @foreach (var region in Regions)
+        {
+            <div class="region-item @(region == SelectedRegion ? "region-active" : "")"
+                 @onclick="() => SelectedRegion = region">
+                @region.Name
+            </div>
+        }
+    </div>
+
+    <div class="regions-container">
+
+        <h3>Connected</h3>
+        <p>Hello @PlayerName</p>
+
+        @if (SelectedRegion != null)
+        {
+            <h2>@SelectedRegion.Name</h2>
+
+            @foreach (var location in SelectedRegion.Locations)
+            {
+                <div class="location-list">
+
+                    <input type="checkbox" @bind="location.IsChecked" />
+
+                    <button class="button button-small">
+                        Copy
+                    </button>
+
+                    <div class="text">
+                        <div class="location-name">@location.Name</div>
+                        <div class="location-hint">@location.Hint</div>
+                    </div>
+
+                </div>
+            }
+        }
+
+        <button class="button" @onclick="SendChecks">Send Checks</button>
+
+    </div>
+
+</div>
+
+@code {
+
+    Region? SelectedRegion;
+
+    protected override void OnInitialized()
+    {
+        SelectedRegion = Regions.FirstOrDefault();
+    }
+
+    [Parameter]
+    public string? PlayerName { get; set; }
+
+    public class Location()
+    {
+        public string Name;
+        public int Id;
+        public string Hint;
+        public bool IsChecked { get; set; }
+    }
+
+    public class Region()
+    {
+        public string Name;
+        public List<Location> Locations;
+    }
+
+    List<Region> Regions = new()
+    {
+        new() { Name="Gemstone Island", Locations=new()
+            {
+                new() { Name="Opened the Fragile Sarcophagus in Candy Island", Hint="Take optional photo #8 in Episode 3 of LiS" },
+                new() { Name="Opened the Obsidian Chest in Candy Island", Hint="Clear a level of Train Valley 2" }
+            } 
+        },
+        new() { Name="Desert Island", Locations=new()
+            {
+                new() { Name="Slay the Draugr in Desert Island", Hint="Complete a hour of Broken Age" },
+                new() { Name="Opened the Silver Barrel in Desert Island", Hint="Find Pixel Toad in Captain Toad, Episode 3 Level 16" }
+            } 
+        },
+        new() { Name="Candy Island", Locations=new()
+            {
+                new() { Name="Opened the Fragile Sarcophagus in Candy Island", Hint="Take optional photo #8 in Episode 3 of LiS" },
+                new() { Name="Opened the Obsidian Chest in Candy Island", Hint="Clear a level of Train Valley 2" }
+            } 
+        }
+    };
+
+    void SendChecks()
+    {
+        var checkedItems = Regions
+            .SelectMany(r => r.Locations)
+            .Where(l => l.IsChecked);
+
+        foreach (var item in checkedItems)
+        {
+            Console.WriteLine(item.Name);
+        }
+    }
+}
