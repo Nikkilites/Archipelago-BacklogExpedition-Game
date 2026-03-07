@@ -295,6 +295,23 @@ h2 {
     margin-right: 8px;
 }
 
+.location-dot {
+    display: inline-block;
+    width: 17px;
+    height: 17px;
+    border: solid;
+    border-width: 2px;
+    border-color: black;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.location-with-hint {
+    display: inline-flex; /* <-- changed from default block */
+    align-items: center; /* vertically center the dot and text */
+    gap: 8px; /* space between dot and message */
+}
+
 .shop-image {
     width: 500px;
     height: 400px;
