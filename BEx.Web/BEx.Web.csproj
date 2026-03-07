@@ -6,4 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\BEx.Core\BEx.Core.csproj" />
+  </ItemGroup>
+
 </Project>

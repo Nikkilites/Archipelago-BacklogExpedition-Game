@@ -86,6 +86,10 @@ h1:focus {
     font-size: 18px;
 }
 
+.logout-button {
+    padding-top: 10px;
+}
+
 
 
 .app-layout {
@@ -198,8 +202,6 @@ h1:focus {
         font-weight: 500;
         font-size: 1.5rem;
     }
-
-
 
 .home-container {
     padding-left: 20px;

@@ -1,135 +1,157 @@
-﻿@page "/connected/{PlayerName}"
+﻿@page "/connected"
+@using Archipelago.MultiClient.Net.Enums
+@using BEx.Core.Model
 @rendermode InteractiveServer
+@inject NavigationManager Nav
 
 <PageTitle>BEx</PageTitle>
 
 <div class="connected-row px-4">
     <div class="title-text">Backlog Expedition</div>
     <div class="text">Welcome @PlayerName, you have been connected to Archipelago!</div>
+    <button class="logout-button button button-small" @onclick="Logout">
+        Logout
+    </button>
 </div>
 
+@if (CurrentSession == null || !CurrentSession.ConnectionHandler.Connected)
+{
+    <div class="loading">Waiting for Server...</div>
+}
+else
+{
+    <div class="app-layout">
 
-<div class="app-layout">
-
-    <div class="notification-container">
-        @foreach (var note in Notifications)
-        {
-            <div class="notification-overlay @(note.IsFading ? "fade-out" : "")" key="@note.Id">
-                <span class="notification-dot" style="background-color:@note.DotColor"></span>
-                @note.Message
-            </div>
-        }
-    </div>
-
-    <div class="game-sidebar">
-
-        <div class="game-item @("Home" == SelectedSidebarItem ? "game-item-active" : "")"
-        @onclick='() => SelectedSidebarItem = "Home"'>
-            Home
-        </div>
-
-        <div class="game-item @("Shop" == SelectedSidebarItem ? "game-item-active" : "")"
-        @onclick='() => SelectedSidebarItem = "Shop"'>
-            Trash Shop
-        </div>
-
-        @foreach (var region in Regions)
-        {
-            <div class="game-item @(region.Name == SelectedSidebarItem ? "game-item-active" : "") @(region.Locations.Count == 0 ? "game-item-finished" : "") "
-            @onclick="() => SelectedSidebarItem = region.Name">
-                @region.Name
-            </div>
-        }
-    </div>
-
-    @if (SelectedSidebarItem == "Home")
-    {
-        <div class="home-container">
-
-            <h2>Treasure</h2>
-            <h5>Treasures found: 2/5</h5>
-
-            <div class="icon-grid">
-                @foreach (var icon in TreasureIcons)
-                {
-                    <div class="icon-item">
-                        <img src="@icon.ImageUrl" title="@icon.Name" class="icon-image" />
-                        <div class="icon-title">@icon.Name</div>
-                        <div class="icon-subtitle">@icon.Name island</div>
-                    </div>
-                }
-            </div>
-
-            <h2>Runes</h2>
-
-            <div class="icon-grid">
-                @foreach (var icon in RuneIcons)
-                {
-                    <div class="icon-item">
-                        <img src="@icon.ImageUrl" title="@icon.Name" class="icon-image" />
-
-                        <div class="icon-title">@icon.Name</div>
-                        <div class="icon-subtitle">(2/2)</div>
-                    </div>
-                }
-            </div>
-
-        </div>
-    }
-    else if (SelectedSidebarItem == "Shop")
-    {
-        <div class="home-container">
-
-            <h2>Trash Shop</h2>
-
-            <img src="https://bostonglobe-prod.cdn.arcpublishing.com/resizer/v2/TBUSCWYXI5DZ5MO4J7ZDV2WORQ.jpg?auth=1b5466bcd0d5446a0fb52291c9fc927b3ce9ac027831a30ea65af6e36542072f&width=1440" title="Trash Panda" class="shop-image" />
-
-            <h5>Trash required: 10/12</h5>
-
-            <button class="button" @onclick="SendHint">
-                Purchase Hint
-            </button>
-        </div>
-    }
-    else
-    {
-        <div class="regions-container">
-
-            @if (SelectedSidebarItem != null)
+        <div class="notification-container">
+            @foreach (var note in Notifications)
             {
-                <h2>@SelectedSidebarItem</h2>
-
-                Region region = Regions.FirstOrDefault(r => r.Name == SelectedSidebarItem);
-
-                if (region.Locations.Count == 0)
-                {
-                    <h5>This island has been fully raided!</h5>
-                }
-                else
-                {
-                    @foreach(var location in region.Locations)
-                    {
-                        <div class="location-list">
-
-                            <input type="checkbox" @bind="location.IsChecked" />
-
-                            <button class="button button-small" @onclick="() => SendCheck(location)" disabled="@( !location.IsChecked )">
-                                Send
-                            </button>
-
-                            <div class="text">
-                                <div class="location-name">@location.Name</div>
-                                <div class="location-hint">@location.Hint</div>
-                            </div>
-
-                        </div>
-                    }
-                }
+                <div class="notification-overlay @(note.IsFading ? "fade-out" : "")" key="@note.Id">
+                    <span class="notification-dot" style="background-color:@note.DotColor"></span>
+                    @note.Message
+                </div>
             }
         </div>
-    }
 
-</div>
+        <div class="game-sidebar">
+
+            <div class="game-item @("Home" == SelectedSidebarItem ? "game-item-active" : "")"
+            @onclick='() => SelectedSidebarItem = "Home"'>
+                Home
+            </div>
+
+            <div class="game-item @("Shop" == SelectedSidebarItem ? "game-item-active" : "")"
+            @onclick='() => SelectedSidebarItem = "Shop"'>
+                Trash Shop
+            </div>
+
+            @foreach (var region in @CurrentSession.RegionHandler.AvailableRegions)
+            {
+                <div class="game-item @(region.Name == SelectedSidebarItem ? "game-item-active" : "") @(region.TreasureFound ? "game-item-finished" : "") "
+                @onclick="() => SelectedSidebarItem = region.Name">
+                    @region.Name Island
+                </div>
+            }
+        </div>
+
+        @if (SelectedSidebarItem == "Home")
+        {
+            <div class="home-container">
+
+                <h2>Treasure</h2>
+                <h5>Treasures found: @CurrentSession.GoalHandler.TreasuresFound/@CurrentSession.GoalHandler.TreasuresToGoal</h5>
+
+                <div class="icon-grid">
+                    @foreach (var region in @CurrentSession.RegionHandler.RegionsWithFoundTreasure)
+                    {
+                        <div class="icon-item">
+                            @*                             <img src="@icon.ImageUrl" title="@icon.Name" class="icon-image" /> *@
+                            <div class="icon-title">@region.TreasureName</div>
+                            <div class="icon-subtitle">@region.Name island</div>
+                        </div>
+                    }
+                </div>
+
+                <h2>Runes</h2>
+
+                <div class="icon-grid">
+                    @if (@CurrentSession.RegionHandler.RegionsWithARune.Count <= 1)
+                    {
+                        <h5>You do not have any runes.</h5>
+                    }
+                    else
+                    {
+                        @foreach (var region in @CurrentSession.RegionHandler.RegionsWithARune.Where(r => r.Name != "Starting").ToList())
+                        {
+                            <div class="icon-item">
+                                @*                         <img src="@icon.ImageUrl" title="@icon.Name" class="icon-image" /> *@
+                                <div class="icon-title">@region.RuneName</div>
+                                <div class="icon-subtitle">(@region.RuneCount/@CurrentSession.RegionHandler.RunesRequired)</div>
+                            </div>
+                        }
+                    }
+                </div>
+
+            </div>
+        }
+        else if (SelectedSidebarItem == "Shop")
+        {
+            <div class="home-container">
+
+                <h2>Trash Shop</h2>
+
+                <img src="https://bostonglobe-prod.cdn.arcpublishing.com/resizer/v2/TBUSCWYXI5DZ5MO4J7ZDV2WORQ.jpg?auth=1b5466bcd0d5446a0fb52291c9fc927b3ce9ac027831a30ea65af6e36542072f&width=1440" title="Trash Panda" class="shop-image" />
+
+                <h5>Trash required: @CurrentSession.ItemHandler.TrashAvailable/@GetHintCost()</h5>
+
+                <button class="button" @onclick="SendHint">
+                    Purchase Hint for @GetHintCost() trash
+                </button>
+            </div>
+        }
+        else
+        {
+            <div class="regions-container">
+
+                @if (SelectedSidebarItem != null)
+                {
+                    <h2>@SelectedSidebarItem Island</h2>
+
+                    Region region = @CurrentSession.RegionHandler.Regions.FirstOrDefault(r => r.Name == SelectedSidebarItem);
+
+                    if (region.Locations.Count == 0)
+                    {
+                        <h5>This island has been fully raided!</h5>
+                    }
+                    else
+                    {
+                        @foreach (var location in region.Locations)
+                        {
+                            if (!LocationChecked.ContainsKey(location))
+                            {
+                                LocationChecked[location] = false;
+                            }
+
+                            <div class="location-list">
+
+                                <input type="checkbox" @bind="LocationChecked[location]" />
+
+                                <button class="button button-small" @onclick="() => SendCheck(location)" disabled="@(!LocationChecked[location])">
+                                    Send
+                                </button>
+
+                                <div class="text">
+                                    <div class="location-name">@location.Name</div>
+                                    <div class="location-hint">@location.Hint</div>
+                                </div>
+
+                            </div>
+                        }
+                    }
+                }
+            </div>
+        }
+    </div>
+}
 
 @code {
     string? SelectedSidebarItem = "Home";
@@ -137,50 +159,11 @@
     [Parameter]
     public string? PlayerName { get; set; }
 
-    public class Location
-    {
-        // NEW: Track if this location is checked
-        public bool IsChecked { get; set; } = false;
-
-        public string Name { get; set; }
-        public int Id { get; set; }
-        public string Hint { get; set; }
-    }
-
-    public class Region
-    {
-        public string Name { get; set; } = "";
-        public List<Location> Locations { get; set; } = new();
-    }
-
     public class Icon
     {
         public string Name { get; set; }
         public string ImageUrl { get; set; }
     }
-
-
-    List<Region> Regions = new()
-    {
-        new() { Name="Gemstone Island", Locations=new()
-            {
-                new() { Name="Opened the Useful Sarcophagus in Candy Island", Hint="Take optional photo #8 in Episode 3 of LiS" },
-                new() { Name="Opened the Obsidian Chest in Candy Island", Hint="Clear a level of Train Valley 2" }
-            }
-        },
-        new() { Name="Desert Island", Locations=new()
-            {
-                new() { Name="Slay the Progression in Desert Island", Hint="Complete a hour of Broken Age" },
-                new() { Name="Opened the Progression Barrel in Desert Island", Hint="Find Pixel Toad in Captain Toad, Episode 3 Level 16" }
-            }
-        },
-        new() { Name="Candy Island", Locations=new()
-            {
-                new() { Name="Opened the Fragile Sarcophagus in Candy Island", Hint="Take optional photo #8 in Episode 3 of LiS" },
-                new() { Name="Opened the Trap Chest in Candy Island", Hint="Clear a level of Train Valley 2" }
-            }
-        }
-    };
 
     List<Icon> TreasureIcons = new()
     {
@@ -196,6 +179,8 @@
 
     };
 
+    Dictionary<Location, bool> LocationChecked = new();
+
     public class Notification
     {
         public string Message { get; set; } = "";
@@ -204,44 +189,136 @@
         public string DotColor { get; set; } = "#00EEEE"; // default cyan
     }
 
+    private GameSession? CurrentSession;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        var result = await ProtectedSessionStore.GetAsync<Guid>("CurrentPlayer");
+        if (result.Success)
+        {
+            Guid sessionId = result.Value;
+            CurrentSession = SessionManager.GetSession(sessionId);
+        }
+
+        if (CurrentSession != null && CurrentSession.ConnectionHandler.Connected)
+        {
+            foreach (var region in CurrentSession.RegionHandler.AvailableRegions)
+                foreach (var location in region.Locations)
+                    LocationChecked[location] = false;
+        }
+        else
+        {
+            await ReloadIfSessionMissingAsync();
+        }
+        StateHasChanged();
+    }
+
+    private async Task ReloadIfSessionMissingAsync()
+    {
+        // Wait 1 second
+        await Task.Delay(1000);
+
+        // Check again if session is still null
+        if (CurrentSession == null || !CurrentSession.ConnectionHandler.Connected)
+        {
+            await Logout();
+        }
+    }
+
     List<Notification> Notifications = new();
 
     void SendCheck(Location location)
     {
-        var region = Regions.FirstOrDefault(r => r.Locations.Contains(location));
+        var region = CurrentSession.RegionHandler.Regions.FirstOrDefault(r => r.Name == SelectedSidebarItem);
         if (region != null)
         {
-            region.Locations.Remove(location);
+            Logger.Log($"Send Location: {location.Name}");
+            region.CheckLocation(location);
+
             StateHasChanged();
 
-
-            string dotColor = "#00EEEE"; // default cyan
-            // Example logic for assigning color based on Name (you can use a proper Rarity property)
-            if (location.Name.Contains("Useful")) dotColor = "#6D8BE8";
-            else if (location.Name.Contains("Progression")) dotColor = "#AF99EF";
-            else if (location.Name.Contains("Trap")) dotColor = "#FA8072";
+            string dotColor = GetHintColor(location);
 
             var notification = new Notification
             {
-                Message = $"Item '{location.Name}' was sent to a player!",
+                Message = $"You sent {location.ScoutedInfo.ItemName} to {location.ScoutedInfo.Player.Name}!",
                 DotColor = dotColor
             };
 
             _ = CreateNotification(notification);
+
+            CurrentSession.GoalHandler.CheckIfGoal();
         }
     }
 
     void SendHint()
     {
-        var notification = new Notification
-            {
-                Message = $"Hint sent!",
-                DotColor = "#00EEEE"
-            };
+        int hintCost = GetHintCost();
+        if (CurrentSession.ItemHandler.TrashAvailable >= hintCost)
+        {
+            List<long> alreadyHintedLocationIds = CurrentSession.ConnectionHandler.GetHints()
+                .Where(h => h.Status == HintStatus.Unspecified)
+                .Select(h => h.LocationId)
+                .ToList();
 
-        _ = CreateNotification(notification);
+            List<Location> allLocations = CurrentSession.RegionHandler.Regions
+                .Where(r => r.Locations.Any())
+                .SelectMany(r => r.Locations)
+                .Where(loc => !alreadyHintedLocationIds.Contains(loc.Id))
+                .ToList();
+
+            if (allLocations.Count > 0)
+            {
+                Random rng = new Random();
+                Location randomLocation = allLocations[rng.Next(allLocations.Count)];
+
+                CurrentSession.ConnectionHandler.SendLocationHint(randomLocation.Id);
+                CurrentSession.ItemHandler.UseTrash(hintCost);
+
+                var notification = new Notification
+                    {
+                        Message = $"Hint was purchased! {randomLocation.ScoutedInfo.Player.Name}'s {randomLocation.ScoutedInfo.ItemName} is behind {randomLocation.Name}",
+                        DotColor = GetHintColor(randomLocation)
+                    };
+
+                _ = CreateNotification(notification);
+                Logger.Log($"Hint was purchased");
+            }
+            else
+            {
+                var notification = new Notification
+                    {
+                        Message = $"You have no unhinted locations to hint!",
+                        DotColor = "#FA8072"
+                    };
+
+                _ = CreateNotification(notification);
+                Logger.Log($"Hint could not be purchased");
+            }
+        }
+        else
+        {
+            var notification = new Notification
+                {
+                    Message = $"You do not have enough trash to pay for this hint!",
+                    DotColor = "#FA8072"
+                };
+
+            _ = CreateNotification(notification);
+            Logger.Log($"Hint could not be purchased");
+        }
     }
 
+    int GetHintCost()
+    {
+        int hintCost = (int)Math.Round(CurrentSession.ItemHandler.TrashInWorld / 20.0, MidpointRounding.AwayFromZero);
+        if (hintCost <= 1)
+            hintCost = 1;
+
+        return hintCost;
+    }
 
     async Task CreateNotification(Notification notification)
     {
@@ -257,6 +334,39 @@
 
         Notifications.Remove(notification);
         StateHasChanged();
+    }
+
+    string GetHintColor(Location location)
+    {
+        switch (location.ScoutedInfo.Flags)
+        {
+            case ItemFlags.Advancement:
+                return "#AF99EF";
+            case ItemFlags.NeverExclude:
+                return "#6D8BE8";
+            case ItemFlags.Trap:
+                return "#FA8072";
+            default:
+                return "#00EEEE";
         }
+    }
+    async Task Logout()
+    {
+        Logger.Log($"logout triggered");
+
+        await CurrentSession.ConnectionHandler.Disconnect();
+
+        var result = await ProtectedSessionStore.GetAsync<Guid>("CurrentPlayer");
+        if (result.Success)
+        {
+            Guid sessionId = result.Value;
+            if (CurrentSession != null)
+            {
+                await ProtectedSessionStore.DeleteAsync("CurrentPlayer");
+                SessionManager.RemoveSession(sessionId);
+            }
+        }
+
+        Nav.NavigateTo("/", true);
     }
 }

@@ -1,10 +1,19 @@
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using BEx.Web.Components;
+using BEx.Web.Services;
+using BEx.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddSingleton<GameSessionManager>();
+
+builder.Services.AddScoped<BEx.Core.ILogger, WebLogger>();
+builder.Services.AddScoped<IMessageService, WebMessageService>();
+builder.Services.AddScoped<IDataLoader, HttpDataLoader>();
 
 var app = builder.Build();
 

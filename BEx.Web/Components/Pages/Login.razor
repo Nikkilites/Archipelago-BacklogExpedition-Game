@@ -1,6 +1,7 @@
 ﻿@page "/"
 @rendermode InteractiveServer
 @inject NavigationManager Nav
+@inject IServiceProvider Services
 
 <PageTitle>BEx Login</PageTitle>
 
@@ -36,12 +37,52 @@
     string? PlayerName = "";
     string? Password = "";
 
-    private void LoginAndConnect()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var result = await ProtectedSessionStore.GetAsync<Guid>("CurrentPlayer");
+
+        if (result.Success)
+        {
+            Guid sessionId = result.Value;
+            var existingSession = SessionManager.GetSession(sessionId);
+
+            if (existingSession != null)
+            {
+                Nav.NavigateTo($"/connected", true);
+                return;
+            }
+        }
+    }
+
+    private async Task LoginAndConnect()
     {
         Console.WriteLine($"Host: {HostPort}");
         Console.WriteLine($"Player: {PlayerName}");
         Console.WriteLine($"Password: {Password}");
 
-        Nav.NavigateTo($"/connected/{PlayerName}");
+        Guid sessionId = Guid.NewGuid();
+
+        GameSession session = SessionManager.CreateSession(
+            HostPort!,
+            PlayerName!,
+            Password ?? "",
+            Services,
+            sessionId);
+
+        if (session != null)
+        {
+            await ProtectedSessionStore.SetAsync("CurrentPlayer", sessionId);
+
+            session.GoalHandler.GoalReached += () =>
+            {
+                Nav.NavigateTo($"/connected");
+            };
+
+            Nav.NavigateTo($"/connected");
+        }
+        else
+        {
+            Nav.NavigateTo("/");
+        }
     }
 }
