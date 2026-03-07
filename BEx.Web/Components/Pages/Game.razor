@@ -7,20 +7,20 @@
 
 <PageTitle>BEx</PageTitle>
 
-<div class="connected-row px-4">
-    <div class="title-text">Backlog Expedition</div>
-    <div class="text">Welcome @PlayerName, you have been connected to Archipelago!</div>
-    <button class="logout-button button button-small" @onclick="Logout">
-        Logout
-    </button>
-</div>
-
 @if (CurrentSession == null || !CurrentSession.ConnectionHandler.Connected)
 {
     <div class="loading">Waiting for Server...</div>
 }
 else
 {
+    <div class="connected-row px-4">
+        <div class="title-text">Backlog Expedition</div>
+        <div class="text">Welcome @CurrentSession.ConnectionHandler.PlayerName, you have been connected to Archipelago!</div>
+        <button class="logout-button button button-small" @onclick="Logout">
+            Logout
+        </button>
+    </div>
+
     <div class="app-layout">
 
         <div class="notification-container">
