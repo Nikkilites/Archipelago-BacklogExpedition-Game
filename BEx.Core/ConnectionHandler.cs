@@ -75,12 +75,12 @@ namespace BEx.Core
 
         public async Task Disconnect()
         {
-            session = null;
-            SlotData = null;
             if (Connected)
             {
                 await session.Socket.DisconnectAsync();
                 Connected = false;
+                session = null;
+                SlotData = null;
             }
         }
 
