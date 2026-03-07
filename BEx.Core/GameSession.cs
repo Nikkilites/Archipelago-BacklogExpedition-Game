@@ -17,18 +17,5 @@
             RegionHandler = new RegionHandler(this, logger);
             GoalHandler = new GoalHandler(this, logger);
         }
-
-        //public event Func<Task>? SessionEnded;
-
-        //public async Task EndSession()
-        //{
-        //    if (SessionEnded != null)
-        //    {
-        //        foreach (var handler in SessionEnded.GetInvocationList().Cast<Func<Task>>())
-        //        {
-        //            await handler();
-        //        }
-        //    }
-        //}
     }
 }

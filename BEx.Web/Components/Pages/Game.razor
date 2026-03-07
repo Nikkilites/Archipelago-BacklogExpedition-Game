@@ -1,5 +1,6 @@
 ﻿@page "/connected"
 @using Archipelago.MultiClient.Net.Enums
+@using Archipelago.MultiClient.Net.Models
 @using BEx.Core.Model
 @rendermode InteractiveServer
 @inject NavigationManager Nav
@@ -164,20 +165,6 @@ else
         public string Name { get; set; }
         public string ImageUrl { get; set; }
     }
-
-    List<Icon> TreasureIcons = new()
-    {
-        new() { Name="Feather", ImageUrl="https://featherplace.com/cdn/shop/files/red-ostrich-feather-drabs-OP12LB--R-ALT1_8eb63759-bc85-4983-a28a-81493ab67646.jpg?v=1690218213&width=1445" },
-        new() { Name="Something", ImageUrl="https://pokalforum.dk/images/produkter/pokaler/2277-p.jpg" }
-    };
-
-    List<Icon> RuneIcons = new()
-    {
-        new() { Name="Gemstone Rune", ImageUrl="https://m.media-amazon.com/images/I/6164aBnzQLL._AC_UF1000,1000_QL80_.jpg" },
-        new() { Name="Candy Rune", ImageUrl="https://thumbs.dreamstime.com/b/swirl-lollipop-candy-round-shape-red-white-background-405125005.jpg" },
-        new() { Name="Desert Rune", ImageUrl="https://media.istockphoto.com/id/1296159259/photo/sand-circle-isolated-on-white-background.jpg?s=170667a&w=0&k=20&c=ANcbV57PPghjwRPp4PJ3NWlLNRJ338cadG1K7ujXONU=" }
-
-    };
 
     Dictionary<Location, bool> LocationChecked = new();
 

@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backlog_Expedition", "Backl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BEx.Web", "BEx.Web\BEx.Web.csproj", "{9C566A5E-A3E4-4B85-8349-2A612484A056}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BEx.Core", "BEx.Core\BEx.Core.csproj", "{0910DD00-C07B-736E-D43F-2AF7E5A609EC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{9C566A5E-A3E4-4B85-8349-2A612484A056}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C566A5E-A3E4-4B85-8349-2A612484A056}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9C566A5E-A3E4-4B85-8349-2A612484A056}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0910DD00-C07B-736E-D43F-2AF7E5A609EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0910DD00-C07B-736E-D43F-2AF7E5A609EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0910DD00-C07B-736E-D43F-2AF7E5A609EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0910DD00-C07B-736E-D43F-2AF7E5A609EC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
