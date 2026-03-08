@@ -70,10 +70,6 @@
 
     private async Task LoginAndConnect()
     {
-        Console.WriteLine($"Host: {HostPort}");
-        Console.WriteLine($"Player: {PlayerName}");
-        Console.WriteLine($"Password: {Password}");
-
         Guid sessionId = Guid.NewGuid();
 
         GameSession session = SessionManager.CreateSession(
