@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using System.Security.Cryptography
 @rendermode InteractiveServer
 @inject NavigationManager Nav
 @inject IServiceProvider Services
@@ -39,18 +40,31 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        var result = await ProtectedSessionStore.GetAsync<Guid>("CurrentPlayer");
+        if (!firstRender) return;
 
-        if (result.Success)
+        try
         {
-            Guid sessionId = result.Value;
-            var existingSession = SessionManager.GetSession(sessionId);
+            var result = await ProtectedSessionStore.GetAsync<Guid>("CurrentPlayer");
 
-            if (existingSession != null)
+            if (result.Success)
             {
-                Nav.NavigateTo($"/connected", true);
-                return;
+                Guid sessionId = result.Value;
+                var existingSession = SessionManager.GetSession(sessionId);
+
+                if (existingSession != null)
+                {
+                    Nav.NavigateTo($"/connected", true);
+                    return;
+                }
+                else
+                {
+                    await ProtectedSessionStore.DeleteAsync("CurrentPlayer");
+                }
             }
+        }
+        catch (CryptographicException)
+        {
+            await ProtectedSessionStore.DeleteAsync("CurrentPlayer");
         }
     }
 
