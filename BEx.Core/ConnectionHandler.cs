@@ -8,12 +8,12 @@ namespace BEx.Core
 {
     public class ConnectionHandler
     {
-        private readonly GameSession _gamesession;
+        private readonly GameSession _gameSession;
         private readonly ILogger _logger;
 
         public ConnectionHandler(GameSession session, ILogger logger)
         {
-            _gamesession = session;
+            _gameSession = session;
             _logger = logger;
         }
 
@@ -27,14 +27,14 @@ namespace BEx.Core
 
         public bool Connect(string server, string player, string pass)
         {
-            _logger.Log($"Will try to connect to server with {server}, {player}, {pass}.");
+            _logger.Log($"Will try to connect to server with server: {server}, player: {player}, password: {pass}");
 
             LoginResult result;
 
             try
             {
                 session = ArchipelagoSessionFactory.CreateSession(server);
-                session.Items.ItemReceived += _gamesession.ItemHandler.OnItemReceived;
+                session.Items.ItemReceived += _gameSession.ItemHandler.OnItemReceived;
                 session.Socket.SocketClosed += OnDisconnect;
                 session.Socket.ErrorReceived += OnError;
                 result = session.TryConnectAndLogin(gameName, player, ItemsHandlingFlags.AllItems, password: pass, requestSlotData: true);
@@ -68,7 +68,7 @@ namespace BEx.Core
 
             PlayerName = player;
 
-            _logger.Log($"Successfully connected to {server}.");
+            _logger.Log($"Successfully connected to {server} as {player}.");
 
             return true;
         }
@@ -89,7 +89,7 @@ namespace BEx.Core
             if (Connected)
             {
                 reason += $"\n    Called from OnDisconnect";
-                _logger.Log($"Disconnected {reason}");
+                _logger.Log($"{_gameSession.ConnectionHandler.PlayerName} Disconnected {reason}");
                 Connected = false;
                 await Disconnect();
             }
@@ -100,7 +100,7 @@ namespace BEx.Core
             if (Connected)
             {
                 message += $"\n    Called from OnError";
-                _logger.Log($"Disconnected {message}");
+                _logger.Log($"{_gameSession.ConnectionHandler.PlayerName} Disconnected {message}");
                 Connected = false;
                 await Disconnect();
             }

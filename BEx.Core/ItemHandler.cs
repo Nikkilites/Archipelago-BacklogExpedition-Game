@@ -49,13 +49,10 @@ namespace BEx.Core
 
         public void OnItemReceived(IReceivedItemsHelper helper)
         {
-            _logger.Log($"Received item from server");
-
             string item = helper.PeekItem().ItemName;
             helper.DequeueItem();
 
             _itemQueue.Enqueue(item);
-            _logger.Log($"Enqueued item: {item}");
         }
 
         private async Task ProcessQueueAsync(CancellationToken token)
@@ -93,7 +90,7 @@ namespace BEx.Core
             {
                 _trashAcquired++;
             }
-            _logger.Log($"Processed item with name: {item}");
+            _logger.Log($"{_session.ConnectionHandler.PlayerName} received item: {item}");
         }
 
         public void UseTrash(int amount)
@@ -101,7 +98,7 @@ namespace BEx.Core
             lock (_lock)
             {
                 trashUsed += amount;
-                _logger.Log($"Used {amount} trash, remaining {TrashAvailable}");
+                _logger.Log($"{_session.ConnectionHandler.PlayerName} used {amount} trash, remaining {TrashAvailable}");
                 OnItemsUpdated?.Invoke(); // notify UI
             }
         }
@@ -111,7 +108,6 @@ namespace BEx.Core
             int slotId = _session.ConnectionHandler.GetThisSlotId();
             string slotName = _session.ConnectionHandler.GetPlayerNameFromSlot(slotId);
             string key = $"BEx_slot:{slotId}_{slotName}:trash_used";
-            _logger.Log($"TrashServerDataStorageKey is: {key}");
             trashServerDataStorageKey = key;
         }
     }

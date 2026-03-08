@@ -16,7 +16,7 @@
 
         private void OnGoalConditionMet()
         {
-            _logger.Log("Goal reached");
+            _logger.Log($"{_gameSession.ConnectionHandler.PlayerName} reached goal!");
 
             _gameSession.ConnectionHandler.SendGoal();
             List<string> goalTexts =
