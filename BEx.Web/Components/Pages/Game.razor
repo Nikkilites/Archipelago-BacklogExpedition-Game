@@ -336,16 +336,17 @@ else
 
     async Task Logout()
     {
-        Logger.Log($"logout triggered");
-
-        await CurrentSession.ConnectionHandler.Disconnect();
-
-        var result = await ProtectedSessionStore.GetAsync<Guid>("CurrentPlayer");
-        if (result.Success)
+        if (CurrentSession != null)
         {
-            Guid sessionId = result.Value;
-            if (CurrentSession != null)
+            Logger.Log($"{CurrentSession.ConnectionHandler.PlayerName} logged out");
+
+            await CurrentSession.ConnectionHandler.Disconnect();
+
+            var result = await ProtectedSessionStore.GetAsync<Guid>("CurrentPlayer");
+            if (result.Success)
             {
+                Guid sessionId = result.Value;
+
                 await ProtectedSessionStore.DeleteAsync("CurrentPlayer");
                 SessionManager.RemoveSession(sessionId);
             }
