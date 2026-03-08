@@ -11,7 +11,7 @@ namespace BEx.Core
 
         private List<Hint>? _allHints;
         private DateTime _lastFetch = DateTime.MinValue;
-        private readonly TimeSpan _cacheDuration = TimeSpan.FromSeconds(30);
+        private readonly TimeSpan _cacheDuration = TimeSpan.FromSeconds(60);
 
         public List<Hint> AllHints
         {
