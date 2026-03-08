@@ -1,0 +1,31 @@
+# Git
+.git
+.gitignore
+
+# Build outputs
+bin/
+obj/
+/publish/
+*.dll
+*.pdb
+
+# IDE
+.vs/
+.vscode/
+*.user
+*.sln.iml
+
+# Dependencies
+node_modules/
+.npmrc
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+
+# GitHub
+.github/
