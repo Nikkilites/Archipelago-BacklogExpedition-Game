@@ -1,23 +1,45 @@
 ﻿using BEx.Core;
+using System.Collections.Concurrent;
 
 namespace BEx.Web.Services
 {
     public class GameSessionManager
     {
-        private readonly Dictionary<Guid, GameSession> _sessions = new();
+        private readonly ConcurrentDictionary<Guid, SessionEntry> _sessions = new();
 
         public GameSession? GetSession(Guid sessionId)
         {
-            if (_sessions.TryGetValue(sessionId, out var session))
-                return session;
+            if (_sessions.TryGetValue(sessionId, out var entry))
+            {
+                entry.LastSeen = DateTime.UtcNow;
+                return entry.Session;
+            }
 
             return null;
         }
 
         public bool HasSession(Guid sessionId) => _sessions.ContainsKey(sessionId);
 
-        public void RemoveSession(Guid sessionId) => _sessions.Remove(sessionId);
+        public async void RemoveSession(Guid sessionId)
+        {
+            if (_sessions.TryRemove(sessionId, out var entry))
+            {
+                await entry.Session.ConnectionHandler.Disconnect();
+            }
+        }
 
+        public void CleanupExpiredSessions()
+        {
+            var now = DateTime.UtcNow;
+
+            foreach (var pair in _sessions)
+            {
+                if (now - pair.Value.LastSeen > TimeSpan.FromMinutes(5))
+                {
+                    RemoveSession(pair.Key);
+                }
+            }
+        }
 
         public GameSession? CreateSession(
             string server,
@@ -41,7 +63,11 @@ namespace BEx.Web.Services
                     return null;
                 }
 
-                _sessions[sessionId] = session;
+                _sessions[sessionId] = new SessionEntry
+                {
+                    Session = session,
+                    LastSeen = DateTime.UtcNow
+                };
 
                 Dictionary<string, object> slotData = session.ConnectionHandler.SlotData;
                 session.GoalHandler.TreasuresToGoal = Convert.ToInt32(slotData["beaten_to_goal"]);
@@ -58,5 +84,11 @@ namespace BEx.Web.Services
                 return null;
             }
         }
+    }
+
+    public class SessionEntry
+    {
+        public GameSession Session { get; set; } = default!;
+        public DateTime LastSeen { get; set; } = DateTime.UtcNow;
     }
 }

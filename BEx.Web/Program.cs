@@ -9,6 +9,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddSingleton<GameSessionManager>();
+builder.Services.AddHostedService<SessionCleanupService>();
 
 builder.Services.AddScoped<BEx.Core.ILogger, WebLogger>();
 builder.Services.AddScoped<IMessageService, WebMessageService>();
