@@ -202,11 +202,18 @@ else
     {
         if (!firstRender) return;
 
-        var result = await ProtectedSessionStore.GetAsync<Guid>("CurrentPlayer");
-        if (result.Success)
+        try
         {
-            Guid sessionId = result.Value;
-            CurrentSession = SessionManager.GetSession(sessionId);
+            var result = await ProtectedSessionStore.GetAsync<Guid>("CurrentPlayer");
+            if (result.Success)
+            {
+                Guid sessionId = result.Value;
+                CurrentSession = SessionManager.GetSession(sessionId);
+            }
+        }
+        catch (CryptographicException)
+        {
+            await ProtectedSessionStore.DeleteAsync("CurrentPlayer");
         }
 
         if (CurrentSession != null && CurrentSession.ConnectionHandler.Connected)
