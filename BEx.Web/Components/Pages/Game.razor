@@ -158,9 +158,17 @@ else
                                 <div class="text">
                                     <div class="location-with-hint">
                                         <div class="location-name">@location.Name</div>
-                                        @if (hints.FirstOrDefault(h => h.LocationId == location.Id) != null)
+
+                                        @{
+                                            var hint = hints.FirstOrDefault(h => h.LocationId == location.Id);
+                                        }
+
+                                        @if (hint != null)
                                         {
-                                            <span class="location-dot" style="background-color:@CurrentSession.HintHandler.GetHintColor(hints.FirstOrDefault(h => h.LocationId == location.Id).ItemFlags)"></span>
+                                            <span class="location-dot"
+                                                  title="@location.ScoutedInfo.ItemName for @location.ScoutedInfo.Player.Name"
+                                                  style="background-color:@CurrentSession.HintHandler.GetHintColor(hints.FirstOrDefault(h => h.LocationId == location.Id).ItemFlags)">
+                                            </span>
                                         }
                                     </div>
                                     <div class="location-hint">@location.Hint</div>
