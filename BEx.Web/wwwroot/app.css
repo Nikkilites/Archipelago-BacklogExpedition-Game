@@ -309,13 +309,13 @@ h2 {
 }
 
 .location-with-hint {
-    display: inline-flex; /* <-- changed from default block */
-    align-items: center; /* vertically center the dot and text */
-    gap: 8px; /* space between dot and message */
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .recent-list {
-    display: flex;
+    display: inline-flex;
     flex-direction: column;
     gap: 10px;
     margin-top: 10px;
