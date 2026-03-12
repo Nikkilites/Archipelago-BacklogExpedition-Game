@@ -48,7 +48,7 @@ else
 
             @foreach (var region in @CurrentSession.RegionHandler.AvailableRegions.OrderBy(r => r.TreasureFound))
             {
-                <div class="game-item @(region.Name == SelectedSidebarItem ? "game-item-active" : "") @(region.TreasureFound ? "game-item-finished" : "") "
+                <div class="game-item @(region.Name == SelectedSidebarItem ? "game-item-active" : "") @((region.TreasureFound && region.Locations.Count == 0) ? "game-item-finished" : "") "
                 @onclick="() => SelectedSidebarItem = region.Name">
                     @region.Name Island
                 </div>
