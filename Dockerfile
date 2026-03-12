@@ -29,14 +29,18 @@ RUN useradd -m -u 1000 appuser
 # Copy published application from builder
 COPY --from=builder --chown=appuser:appuser /app/publish .
 
+# Create and set permissions for data protection directory
+RUN mkdir -p /home/appuser/.aspnet/DataProtection-Keys && \
+    chown -R appuser:appuser /home/appuser/.aspnet
+
 USER appuser
 
 # Expose port
 EXPOSE 8080
 
-# Health check
+# Health check using wget (lightweight alternative)
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:8080/ || exit 1
+  CMD wget -q -O- http://localhost:8080/ || exit 1
 
 # Run application
 ENTRYPOINT ["dotnet", "BEx.Web.dll"]

@@ -1,12 +1,17 @@
 using BEx.Web.Components;
 using BEx.Web.Services;
 using BEx.Core;
+using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services
+    .AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo("/home/appuser/.aspnet/DataProtection-Keys"));
 
 builder.Services.AddSingleton<GameSessionManager>();
 builder.Services.AddHostedService<SessionCleanupService>();
