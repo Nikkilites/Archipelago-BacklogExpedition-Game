@@ -159,8 +159,8 @@ else
                                         @if (hint != null)
                                         {
                                             <span class="location-dot"
-                                                  title="@location.ScoutedInfo.ItemName for @location.ScoutedInfo.Player.Name"
-                                                  style="background-color:@CurrentSession.HintHandler.GetHintColor(hints.FirstOrDefault(h => h.LocationId == location.Id).ItemFlags)">
+                                                title="@location.ScoutedInfo.ItemName for @location.ScoutedInfo.Player.Name"
+                                                style="background-color:@CurrentSession.HintHandler.GetHintColor(hint.ItemFlags)">
                                             </span>
                                         }
                                     </div>
