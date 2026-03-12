@@ -14,6 +14,7 @@ namespace BEx.Core
         public List<Region> AvailableRegions => Regions.Where(r => r.RuneReceived).ToList();
         public List<Region> RegionsWithARune => Regions.Where(r => r.RuneCount >= 1).ToList();
         public List<Region> RegionsWithFoundTreasure => Regions.Where(r => r.TreasureFound).ToList();
+        public List<Region> RegionsInWorld => Regions.Where(r => r.RuneReceived || r.Locations.Count() != 0).ToList();
 
         public int RunesRequired { get; set; } = 1;
 

@@ -83,7 +83,7 @@ else
                 <h2>Runes</h2>
 
                 <div class="icon-grid">
-                    @foreach (var region in @CurrentSession.RegionHandler.Regions.Where(r => r.Name != "Starting").ToList())
+                    @foreach (var region in @CurrentSession.RegionHandler.RegionsInWorld.Where(r => r.Name != "Starting").ToList())
                     {
                         <div class="icon-item">
                             @*                         <img src="@icon.ImageUrl" title="@icon.Name" class="icon-image" /> *@
