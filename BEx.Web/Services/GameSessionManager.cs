@@ -1,5 +1,6 @@
 ﻿using BEx.Core;
 using System.Collections.Concurrent;
+using static BEx.Web.Components.Pages.Game;
 
 namespace BEx.Web.Services
 {
@@ -18,9 +19,20 @@ namespace BEx.Web.Services
             return null;
         }
 
+        public SessionEntry? GetSessionEntry(Guid sessionId)
+        {
+            if (_sessions.TryGetValue(sessionId, out var entry))
+            {
+                entry.LastSeen = DateTime.UtcNow;
+                return entry;
+            }
+
+            return null;
+        }
+
         public bool HasSession(Guid sessionId) => _sessions.ContainsKey(sessionId);
 
-        public async void RemoveSession(Guid sessionId)
+        public async Task RemoveSession(Guid sessionId)
         {
             if (_sessions.TryRemove(sessionId, out var entry))
             {
@@ -90,5 +102,6 @@ namespace BEx.Web.Services
     {
         public GameSession Session { get; set; } = default!;
         public DateTime LastSeen { get; set; } = DateTime.UtcNow;
+        public List<Notification> RecentLocationsSent { get; } = new();
     }
 }

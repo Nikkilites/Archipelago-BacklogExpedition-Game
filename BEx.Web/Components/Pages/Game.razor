@@ -93,6 +93,27 @@ else
                     }
                 </div>
 
+                <h2>Recent Locations Sent</h2>
+
+                @if (CurrentSessionEntry?.RecentLocationsSent.Count == 0)
+                {
+                    <h5>You have yet to send any locations this session.</h5>
+                }
+                else
+                {
+                    <div class="recent-list">
+                        @foreach (var notification in CurrentSessionEntry.RecentLocationsSent.TakeLast(5).Reverse())
+                        {
+                            <div class="recent-item">
+                                <div class="recent-message">@notification.Message</div>
+                                <span class="recent-dot"
+                                        style="background-color:@notification.DotColor">
+                                </span>
+                            </div>
+                        }
+                    </div>
+                }
+
             </div>
         }
         else if (SelectedSidebarItem == "Shop")
@@ -192,6 +213,7 @@ else
         public string DotColor { get; set; } = "#00EEEE"; // default cyan
     }
 
+    private SessionEntry? CurrentSessionEntry;
     private GameSession? CurrentSession;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -204,7 +226,8 @@ else
             if (result.Success)
             {
                 Guid sessionId = result.Value;
-                CurrentSession = SessionManager.GetSession(sessionId);
+                CurrentSessionEntry = SessionManager.GetSessionEntry(sessionId);
+                CurrentSession = CurrentSessionEntry?.Session;
             }
         }
         catch (CryptographicException)
@@ -212,7 +235,7 @@ else
             await ProtectedSessionStore.DeleteAsync("CurrentPlayer");
         }
 
-        if (CurrentSession != null && CurrentSession.ConnectionHandler.Connected)
+        if (CurrentSessionEntry != null && CurrentSession.ConnectionHandler.Connected)
         {
             foreach (var region in CurrentSession.RegionHandler.AvailableRegions)
                 foreach (var location in region.Locations)
@@ -256,6 +279,8 @@ else
                 Message = $"You sent {location.ScoutedInfo.ItemName} to {location.ScoutedInfo.Player.Name}!",
                 DotColor = dotColor
             };
+
+            CurrentSessionEntry?.RecentLocationsSent.Add(notification);
 
             _ = CreateNotification(notification);
 
