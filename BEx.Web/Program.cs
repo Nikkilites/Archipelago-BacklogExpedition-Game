@@ -11,6 +11,7 @@ builder.Services.AddRazorComponents()
 
 builder.Services
     .AddDataProtection()
+    .SetApplicationName("BEx-Web")
     .PersistKeysToFileSystem(new DirectoryInfo("/home/appuser/.aspnet/DataProtection-Keys"));
 
 builder.Services.AddSingleton<GameSessionManager>();
