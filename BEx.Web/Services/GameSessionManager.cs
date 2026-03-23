@@ -1,4 +1,5 @@
 ﻿using BEx.Core;
+using Microsoft.AspNetCore.Http;
 using System.Collections.Concurrent;
 using static BEx.Web.Components.Pages.Game;
 
@@ -84,6 +85,15 @@ namespace BEx.Web.Services
                 Dictionary<string, object> slotData = session.ConnectionHandler.SlotData;
                 session.GoalHandler.TreasuresToGoal = Convert.ToInt32(slotData["beaten_to_goal"]);
                 //_session.RegionHandler.RunesRequired = Convert.ToInt32(slotData["runes_required"]);
+                if (slotData.TryGetValue("runes_required", out var value))
+                {
+                    session.RegionHandler.RunesRequired = Convert.ToInt32(value);
+                }
+                else
+                {
+                    session.RegionHandler.RunesRequired = 1;
+                }
+
                 session.RegionHandler.CreateRegions(slotData);
 
                 session.ItemHandler.SetupItemHandler();
