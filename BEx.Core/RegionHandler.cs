@@ -39,7 +39,7 @@ namespace BEx.Core
 
         private async Task<List<Location>> CreateLocations(Dictionary<string, object> slotData)
         {
-            _logger.Log($"Will Process Hint Location Data");
+            _logger.Log($"Will Process Hint Location Data for {_gameSession.ConnectionHandler.PlayerName}");
 
             Dictionary<int, string> HintData = JsonSerializer.Deserialize<Dictionary<int, string>>(slotData["hint_data"].ToString());
 
