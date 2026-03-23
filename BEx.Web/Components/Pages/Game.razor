@@ -107,7 +107,7 @@ else
                             <div class="recent-item">
                                 <div class="recent-message">@notification.Message</div>
                                 <span class="recent-dot"
-                                        style="background-color:@notification.DotColor">
+                                style="background-color:@notification.DotColor">
                                 </span>
                             </div>
                         }
@@ -152,7 +152,7 @@ else
                             <h5>You have found the treasure on this island!</h5>
                         }
 
-                        List<Hint> hints = @CurrentSession.HintHandler.AllHints;
+                        List<Hint> hints = @CurrentSession.HintHandler.AllHints.Where(h => h.FindingPlayer == CurrentSession.ConnectionHandler.GetThisSlotId()).ToList();
 
                         @foreach (var location in region.Locations)
                         {
@@ -293,7 +293,8 @@ else
         int hintCost = CurrentSession.HintHandler.GetHintCost();
         if (CurrentSession.ItemHandler.TrashAvailable >= hintCost)
         {
-            List<long> alreadyHintedLocationIds = CurrentSession.ConnectionHandler.GetHints()
+            List<long> alreadyHintedLocationIds = CurrentSession.HintHandler.AllHints
+                .Where(h => h.FindingPlayer == CurrentSession.ConnectionHandler.GetThisSlotId())
                 .Where(h => h.Status == HintStatus.Unspecified)
                 .Select(h => h.LocationId)
                 .ToList();
