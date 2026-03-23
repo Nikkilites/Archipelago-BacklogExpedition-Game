@@ -184,7 +184,7 @@ namespace BEx.Core
 
         public Hint[] GetHints()
         {
-            return session.Hints.GetHints();
+            return session.Hints.GetHints(GetThisSlotId());
         }
 
         public async Task<Dictionary<long, ScoutedItemInfo>> ScoutLocations(long[] ids)
