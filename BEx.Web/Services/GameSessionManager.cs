@@ -1,5 +1,4 @@
 ﻿using BEx.Core;
-using Microsoft.AspNetCore.Http;
 using System.Collections.Concurrent;
 using static BEx.Web.Components.Pages.Game;
 
@@ -66,8 +65,9 @@ namespace BEx.Web.Services
                 var logger = services.GetRequiredService<Core.ILogger>();
                 var loader = services.GetRequiredService<IDataLoader>();
                 var messages = services.GetRequiredService<IMessageService>();
+                var textClient = services.GetRequiredService<ITextClient>();
 
-                var session = new GameSession(logger, messages, loader);
+                var session = new GameSession(logger, textClient, messages, loader);
 
                 bool success = session.ConnectionHandler.Connect(server, player, password);
 

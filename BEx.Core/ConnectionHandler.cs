@@ -10,11 +10,13 @@ namespace BEx.Core
     {
         private readonly GameSession _gameSession;
         private readonly ILogger _logger;
+        private readonly ITextClient _textClient;
 
-        public ConnectionHandler(GameSession session, ILogger logger)
+        public ConnectionHandler(GameSession session, ILogger logger, ITextClient textClient)
         {
             _gameSession = session;
             _logger = logger;
+            _textClient = textClient;
         }
 
         private ArchipelagoSession session;

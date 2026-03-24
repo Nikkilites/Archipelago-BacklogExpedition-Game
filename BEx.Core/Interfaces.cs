@@ -19,6 +19,14 @@ namespace BEx.Core
         Error
     }
 
+    public interface ITextClient
+    {
+        public event Action? OnMessageAdded;
+        IReadOnlyList<string> GetLines();
+        void ShowMessage(string message);
+        void SendMessageToServer(GameSession session, string message);
+    }
+
     public interface IDataLoader
     {
         T Load<T>(string path);
