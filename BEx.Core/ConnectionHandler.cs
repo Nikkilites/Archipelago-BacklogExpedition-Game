@@ -1,5 +1,6 @@
 ﻿using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.Enums;
+using Archipelago.MultiClient.Net.MessageLog.Messages;
 using Archipelago.MultiClient.Net.Models;
 using Archipelago.MultiClient.Net.Packets;
 using System.Collections.ObjectModel;
@@ -39,6 +40,7 @@ namespace BEx.Core
                 session.Items.ItemReceived += _gameSession.ItemHandler.OnItemReceived;
                 session.Socket.SocketClosed += OnDisconnect;
                 session.Socket.ErrorReceived += OnError;
+                session.MessageLog.OnMessageReceived += OnMessageReceived;
                 result = session.TryConnectAndLogin(gameName, player, ItemsHandlingFlags.AllItems, password: pass, requestSlotData: true);
             }
             catch (Exception e)
@@ -203,6 +205,35 @@ namespace BEx.Core
         {
             _logger.Log($"Update Server Data Storage {key} to {value}");
             session.DataStorage[key] = value;
+        }
+
+        public void SendMessage(string message)
+        {
+            try
+            {
+                if (!Connected)
+                {
+                    _textClient.ShowMessage($"Failed to send '{message}' due to disconnect.");
+                    return;
+                }
+                session.Socket.SendPacketAsync(new SayPacket() { Text = message });
+            }
+            catch (Exception e)
+            {
+                _logger.Log($"Error when sending message {e}");
+            }
+        }
+
+        public void OnMessageReceived(LogMessage message)
+        {
+            try
+            {
+                _textClient.ShowMessage(message.ToString());
+            }
+            catch (Exception e)
+            {
+                _logger.Log($"Error when parsing received message {e}");
+            }
         }
     }
 }
