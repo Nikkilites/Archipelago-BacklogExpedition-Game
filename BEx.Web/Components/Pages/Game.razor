@@ -4,6 +4,7 @@
 @using BEx.Core.Model
 @using System.Security.Cryptography
 @rendermode InteractiveServer
+@implements IDisposable
 @inject NavigationManager Nav
 
 <PageTitle>BEx</PageTitle>
@@ -39,6 +40,11 @@ else
             <div class="game-item @("Home" == SelectedSidebarItem ? "game-item-active" : "")"
             @onclick='() => SelectedSidebarItem = "Home"'>
                 Home
+            </div>
+
+            <div class="game-item @("Text" == SelectedSidebarItem ? "game-item-active" : "")"
+            @onclick='() => SelectedSidebarItem = "Text"'>
+                Text Client
             </div>
 
             <div class="game-item @("Shop" == SelectedSidebarItem ? "game-item-active" : "")"
@@ -116,6 +122,33 @@ else
 
             </div>
         }
+        else if (SelectedSidebarItem == "Text")
+        {
+            <div class="text-client-container">
+
+                <h2>Text Client</h2>
+
+                <div class="text-console">
+                    @foreach (var line in TextLines)
+                    {
+                        <div class="console-line">@line</div>
+                    }
+                </div>
+
+                <div class="text-input-row">
+                    <input class="text-input"
+                    @bind="CurrentInput"
+                    @bind:event="oninput"
+                    @onkeydown="HandleKeyDown"
+                    placeholder="Type message..." />
+
+                    <button class="button button-small" @onclick="SendTextMessage">
+                        Send
+                    </button>
+                </div>
+
+            </div>
+        }
         else if (SelectedSidebarItem == "Shop")
         {
             <div class="home-container">
@@ -180,8 +213,8 @@ else
                                         @if (hint != null)
                                         {
                                             <span class="location-dot"
-                                                title="@location.ScoutedInfo.ItemName for @location.ScoutedInfo.Player.Name"
-                                                style="background-color:@CurrentSession.HintHandler.GetHintColor(hint.ItemFlags)">
+                                            title="@location.ScoutedInfo.ItemName for @location.ScoutedInfo.Player.Name"
+                                            style="background-color:@CurrentSession.HintHandler.GetHintColor(hint.ItemFlags)">
                                             </span>
                                         }
                                     </div>
@@ -240,6 +273,13 @@ else
             foreach (var region in CurrentSession.RegionHandler.AvailableRegions)
                 foreach (var location in region.Locations)
                     LocationChecked[location] = false;
+
+            if (!_subscribedTextClient && CurrentSession?.TextClient != null)
+            {
+                _textClient = CurrentSession.TextClient;   // store it
+                _textClient.OnMessageAdded += HandleNewMessage;
+                _subscribedTextClient = true;
+            }
         }
         else
         {
@@ -257,6 +297,14 @@ else
         if (CurrentSession == null || !CurrentSession.ConnectionHandler.Connected)
         {
             await Logout();
+        }
+    }
+
+    public void Dispose()
+    {
+        if (_subscribedTextClient && _textClient != null)
+        {
+            _textClient.OnMessageAdded -= HandleNewMessage;
         }
     }
 
@@ -344,6 +392,40 @@ else
 
             _ = CreateNotification(notification);
             Logger.Log($"Hint could not be purchased");
+        }
+    }
+
+    string CurrentInput = "";
+    ElementReference consoleRef;
+
+    List<string> TextLines => _textClient?.GetLines().ToList() ?? new();
+
+    bool _subscribedTextClient = false;
+
+    ITextClient? _textClient;
+
+    void HandleNewMessage()
+    {
+        if (SelectedSidebarItem == "Text")
+        {
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    async Task SendTextMessage()
+    {
+        if (!string.IsNullOrWhiteSpace(CurrentInput))
+        {
+            _textClient.SendMessageToServer(CurrentSession, CurrentInput);
+            CurrentInput = "";
+        }
+    }
+
+    async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await SendTextMessage();
         }
     }
 
