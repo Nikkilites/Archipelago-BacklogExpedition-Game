@@ -65,7 +65,7 @@ namespace BEx.Web.Services
                 var logger = services.GetRequiredService<Core.ILogger>();
                 var loader = services.GetRequiredService<IDataLoader>();
                 var messages = services.GetRequiredService<IMessageService>();
-                var textClient = services.GetRequiredService<ITextClient>();
+                var textClient = new WebTextClient();
 
                 var session = new GameSession(logger, textClient, messages, loader);
 

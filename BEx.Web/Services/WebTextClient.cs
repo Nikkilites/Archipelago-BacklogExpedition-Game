@@ -2,7 +2,7 @@
 
 namespace BEx.Web.Services
 {
-    public class TextClientService : ITextClient
+    public class WebTextClient : ITextClient
     {
         private static List<string> textLines = new List<string>();
         private const int MAX_TEXT_LINES = 80;

@@ -20,7 +20,6 @@ builder.Services.AddHostedService<SessionCleanupService>();
 builder.Services.AddScoped<BEx.Core.ILogger, WebLogger>();
 builder.Services.AddScoped<IMessageService, WebMessageService>();
 builder.Services.AddScoped<IDataLoader, HttpDataLoader>();
-builder.Services.AddScoped<ITextClient, TextClientService>();
 
 var app = builder.Build();
 
