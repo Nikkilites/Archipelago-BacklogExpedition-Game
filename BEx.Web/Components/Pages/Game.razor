@@ -1,0 +1,468 @@
+﻿@page "/connected"
+@using Archipelago.MultiClient.Net.Enums
+@using Archipelago.MultiClient.Net.Models
+@using BEx.Core.Model
+@using System.Security.Cryptography
+@rendermode InteractiveServer
+@implements IDisposable
+@inject NavigationManager Nav
+
+<PageTitle>BEx</PageTitle>
+
+@if (CurrentSession == null || !CurrentSession.ConnectionHandler.Connected)
+{
+    <div class="loading">Waiting for Server...</div>
+}
+else
+{
+    <div class="connected-row px-4">
+        <div class="title-text">Backlog Expedition</div>
+        <div class="text">Welcome @CurrentSession.ConnectionHandler.PlayerName, you have been connected to Archipelago!</div>
+        <button class="logout-button button button-small" @onclick="Logout">
+            Logout
+        </button>
+    </div>
+
+    <div class="app-layout">
+
+        <div class="notification-container">
+            @foreach (var note in Notifications)
+            {
+                <div class="notification-overlay @(note.IsFading ? "fade-out" : "")" key="@note.Id">
+                    <span class="notification-dot" style="background-color:@note.DotColor"></span>
+                    @note.Message
+                </div>
+            }
+        </div>
+
+        <div class="game-sidebar">
+
+            <div class="game-item @("Home" == SelectedSidebarItem ? "game-item-active" : "")"
+            @onclick='() => SelectedSidebarItem = "Home"'>
+                Home
+            </div>
+
+            <div class="game-item @("Text" == SelectedSidebarItem ? "game-item-active" : "")"
+            @onclick='() => SelectedSidebarItem = "Text"'>
+                Text Client
+            </div>
+
+            <div class="game-item @("Shop" == SelectedSidebarItem ? "game-item-active" : "")"
+            @onclick='() => SelectedSidebarItem = "Shop"'>
+                Trash Shop
+            </div>
+
+            @foreach (var region in @CurrentSession.RegionHandler.AvailableRegions.OrderBy(r => r.TreasureFound))
+            {
+                <div class="game-item @(region.Name == SelectedSidebarItem ? "game-item-active" : "") @((region.TreasureFound && region.Locations.Count == 0) ? "game-item-finished" : "") "
+                @onclick="() => SelectedSidebarItem = region.Name">
+                    @region.Name Island
+                </div>
+            }
+        </div>
+
+        @if (SelectedSidebarItem == "Home")
+        {
+            <div class="home-container">
+
+                <h2>Treasure</h2>
+                <h5>Treasures found: @CurrentSession.GoalHandler.TreasuresFound/@CurrentSession.GoalHandler.TreasuresToGoal</h5>
+
+                <div class="icon-grid">
+                    @if (@CurrentSession.RegionHandler.RegionsWithFoundTreasure.Count <= 0)
+                    {
+                        <h5>You do not have any treasures.</h5>
+                    }
+                    else
+                    {
+                        @foreach (var region in @CurrentSession.RegionHandler.RegionsWithFoundTreasure)
+                        {
+                            <div class="icon-item">
+                                @*                             <img src="@icon.ImageUrl" title="@icon.Name" class="icon-image" /> *@
+                                <div class="icon-title">@region.TreasureName</div>
+                                <div class="icon-subtitle">@region.Name Island</div>
+                            </div>
+                        }
+                    }
+                </div>
+
+                <h2>Runes</h2>
+
+                <div class="icon-grid">
+                    @foreach (var region in @CurrentSession.RegionHandler.RegionsInWorld.Where(r => r.Name != "Starting").ToList())
+                    {
+                        <div class="icon-item">
+                            @*                         <img src="@icon.ImageUrl" title="@icon.Name" class="icon-image" /> *@
+                            <div class="icon-title">@region.RuneName</div>
+                            <div class="icon-subtitle">(@region.RuneCount/@CurrentSession.RegionHandler.RunesRequired)</div>
+                        </div>
+                    }
+                </div>
+
+                <h2>Recent Locations Sent</h2>
+
+                @if (CurrentSessionEntry?.RecentLocationsSent.Count == 0)
+                {
+                    <h5>You have yet to send any locations this session.</h5>
+                }
+                else
+                {
+                    <div class="recent-list">
+                        @foreach (var notification in CurrentSessionEntry.RecentLocationsSent.TakeLast(5).Reverse())
+                        {
+                            <div class="recent-item">
+                                <div class="recent-message">@notification.Message</div>
+                                <span class="recent-dot"
+                                style="background-color:@notification.DotColor">
+                                </span>
+                            </div>
+                        }
+                    </div>
+                }
+
+            </div>
+        }
+        else if (SelectedSidebarItem == "Text")
+        {
+            <div class="text-client-container">
+
+                <h2>Text Client</h2>
+
+                <div class="text-console">
+                    @foreach (var line in TextLines)
+                    {
+                        <div class="console-line">@line</div>
+                    }
+                </div>
+
+                <div class="text-input-row">
+                    <input class="text-input"
+                    @bind="CurrentInput"
+                    @bind:event="oninput"
+                    @onkeydown="HandleKeyDown"
+                    placeholder="Type message..." />
+
+                    <button class="button button-small" @onclick="SendTextMessage">
+                        Send
+                    </button>
+                </div>
+
+            </div>
+        }
+        else if (SelectedSidebarItem == "Shop")
+        {
+            <div class="home-container">
+
+                <h2>Trash Shop</h2>
+
+                <img src="https://bostonglobe-prod.cdn.arcpublishing.com/resizer/v2/TBUSCWYXI5DZ5MO4J7ZDV2WORQ.jpg?auth=1b5466bcd0d5446a0fb52291c9fc927b3ce9ac027831a30ea65af6e36542072f&width=1440" title="Trash Panda" class="shop-image" />
+
+                <h5>Trash required: @CurrentSession.ItemHandler.TrashAvailable/@CurrentSession.HintHandler.GetHintCost()</h5>
+
+                <button class="button" @onclick="SendHint">
+                    Purchase Hint for @CurrentSession.HintHandler.GetHintCost() trash
+                </button>
+            </div>
+        }
+        else
+        {
+            <div class="regions-container">
+
+                @if (SelectedSidebarItem != null)
+                {
+                    <h2>@SelectedSidebarItem Island</h2>
+
+                    Region region = @CurrentSession.RegionHandler.Regions.FirstOrDefault(r => r.Name == SelectedSidebarItem);
+
+                    if (region.Locations.Count == 0)
+                    {
+                        <h5>This island has been fully raided!</h5>
+                    }
+                    else
+                    {
+                        if (region.TreasureFound)
+                        {
+                            <h5>You have found the treasure on this island!</h5>
+                        }
+
+                        List<Hint> hints = @CurrentSession.HintHandler.AllHints.Where(h => h.FindingPlayer == CurrentSession.ConnectionHandler.GetThisSlotId()).ToList();
+
+                        @foreach (var location in region.Locations)
+                        {
+                            if (!LocationChecked.ContainsKey(location))
+                            {
+                                LocationChecked[location] = false;
+                            }
+
+                            <div class="location-list">
+
+                                <input type="checkbox" @bind="LocationChecked[location]" />
+
+                                <button class="button button-small" @onclick="() => SendCheck(location)" disabled="@(!LocationChecked[location])">
+                                    Send
+                                </button>
+
+                                <div class="text">
+                                    <div class="location-with-hint">
+                                        <div class="location-name">@location.Name</div>
+
+                                        @{
+                                            var hint = hints.FirstOrDefault(h => h.LocationId == location.Id);
+                                        }
+
+                                        @if (hint != null)
+                                        {
+                                            <span class="location-dot"
+                                            title="@location.ScoutedInfo.ItemName for @location.ScoutedInfo.Player.Name"
+                                            style="background-color:@CurrentSession.HintHandler.GetHintColor(hint.ItemFlags)">
+                                            </span>
+                                        }
+                                    </div>
+                                    <div class="location-hint">@location.Hint</div>
+                                </div>
+
+                            </div>
+                        }
+                    }
+                }
+            </div>
+        }
+    </div>
+}
+
+@code {
+    string? SelectedSidebarItem = "Home";
+
+    [Parameter]
+    public string? PlayerName { get; set; }
+
+    Dictionary<Location, bool> LocationChecked = new();
+
+    public class Notification
+    {
+        public string Message { get; set; } = "";
+        public Guid Id { get; set; } = Guid.NewGuid();
+        public bool IsFading { get; set; } = false;
+        public string DotColor { get; set; } = "#00EEEE"; // default cyan
+    }
+
+    private SessionEntry? CurrentSessionEntry;
+    private GameSession? CurrentSession;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        try
+        {
+            var result = await ProtectedSessionStore.GetAsync<Guid>("CurrentPlayer");
+            if (result.Success)
+            {
+                Guid sessionId = result.Value;
+                CurrentSessionEntry = SessionManager.GetSessionEntry(sessionId);
+                CurrentSession = CurrentSessionEntry?.Session;
+            }
+        }
+        catch (CryptographicException)
+        {
+            await ProtectedSessionStore.DeleteAsync("CurrentPlayer");
+        }
+
+        if (CurrentSessionEntry != null && CurrentSession.ConnectionHandler.Connected)
+        {
+            foreach (var region in CurrentSession.RegionHandler.AvailableRegions)
+                foreach (var location in region.Locations)
+                    LocationChecked[location] = false;
+
+            if (!_subscribedTextClient && CurrentSession?.TextClient != null)
+            {
+                _textClient = CurrentSession.TextClient;   // store it
+                _textClient.OnMessageAdded += HandleNewMessage;
+                _subscribedTextClient = true;
+            }
+        }
+        else
+        {
+            await ReloadIfSessionMissingAsync();
+        }
+        StateHasChanged();
+    }
+
+    private async Task ReloadIfSessionMissingAsync()
+    {
+        // Wait 1 second
+        await Task.Delay(1000);
+
+        // Check again if session is still null
+        if (CurrentSession == null || !CurrentSession.ConnectionHandler.Connected)
+        {
+            await Logout();
+        }
+    }
+
+    public void Dispose()
+    {
+        if (_subscribedTextClient && _textClient != null)
+        {
+            _textClient.OnMessageAdded -= HandleNewMessage;
+        }
+    }
+
+    List<Notification> Notifications = new();
+
+    void SendCheck(Location location)
+    {
+        var region = CurrentSession.RegionHandler.Regions.FirstOrDefault(r => r.Name == SelectedSidebarItem);
+        if (region != null)
+        {
+            Logger.Log($"Send Location: {location.Name}");
+            region.CheckLocation(location);
+
+            StateHasChanged();
+
+            string dotColor = CurrentSession.HintHandler.GetHintColor(location.ScoutedInfo.Flags);
+
+            var notification = new Notification
+            {
+                Message = $"You sent {location.ScoutedInfo.ItemName} to {location.ScoutedInfo.Player.Name}!",
+                DotColor = dotColor
+            };
+
+            CurrentSessionEntry?.RecentLocationsSent.Add(notification);
+
+            _ = CreateNotification(notification);
+
+            CurrentSession.GoalHandler.CheckIfGoal();
+        }
+    }
+
+    void SendHint()
+    {
+        int hintCost = CurrentSession.HintHandler.GetHintCost();
+        if (CurrentSession.ItemHandler.TrashAvailable >= hintCost)
+        {
+            List<long> alreadyHintedLocationIds = CurrentSession.HintHandler.AllHints
+                .Where(h => h.FindingPlayer == CurrentSession.ConnectionHandler.GetThisSlotId())
+                .Where(h => h.Status == HintStatus.Unspecified)
+                .Select(h => h.LocationId)
+                .ToList();
+
+            List<Location> allLocations = CurrentSession.RegionHandler.Regions
+                .Where(r => r.Locations.Any())
+                .SelectMany(r => r.Locations)
+                .Where(loc => !alreadyHintedLocationIds.Contains(loc.Id))
+                .ToList();
+
+            if (allLocations.Count > 0)
+            {
+                Random rng = new Random();
+                Location randomLocation = allLocations[rng.Next(allLocations.Count)];
+
+                CurrentSession.ConnectionHandler.SendLocationHint(randomLocation.Id);
+                CurrentSession.ItemHandler.UseTrash(hintCost);
+
+                var notification = new Notification
+                    {
+                        Message = $"Hint was purchased! {randomLocation.ScoutedInfo.Player.Name}'s {randomLocation.ScoutedInfo.ItemName} is behind {randomLocation.Name}",
+                        DotColor = CurrentSession.HintHandler.GetHintColor(randomLocation.ScoutedInfo.Flags)
+                    };
+
+                _ = CreateNotification(notification);
+                Logger.Log($"{CurrentSession.ConnectionHandler.PlayerName} puchased a Hint");
+            }
+            else
+            {
+                var notification = new Notification
+                    {
+                        Message = $"You have no unhinted locations to hint!",
+                        DotColor = "#FA8072"
+                    };
+
+                _ = CreateNotification(notification);
+                Logger.Log($"Hint could not be purchased");
+            }
+        }
+        else
+        {
+            var notification = new Notification
+                {
+                    Message = $"You do not have enough trash to pay for this hint!",
+                    DotColor = "#FA8072"
+                };
+
+            _ = CreateNotification(notification);
+            Logger.Log($"Hint could not be purchased");
+        }
+    }
+
+    string CurrentInput = "";
+    ElementReference consoleRef;
+
+    List<string> TextLines => _textClient?.GetLines().ToList() ?? new();
+
+    bool _subscribedTextClient = false;
+
+    ITextClient? _textClient;
+
+    void HandleNewMessage()
+    {
+        if (SelectedSidebarItem == "Text")
+        {
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    async Task SendTextMessage()
+    {
+        if (!string.IsNullOrWhiteSpace(CurrentInput))
+        {
+            _textClient.SendMessageToServer(CurrentSession, CurrentInput);
+            CurrentInput = "";
+        }
+    }
+
+    async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await SendTextMessage();
+        }
+    }
+
+    async Task CreateNotification(Notification notification)
+    {
+        Notifications.Add(notification);
+        StateHasChanged();
+
+        await Task.Delay(5000);
+
+        notification.IsFading = true;
+        StateHasChanged();
+
+        await Task.Delay(500);
+
+        Notifications.Remove(notification);
+        StateHasChanged();
+    }
+
+    async Task Logout()
+    {
+        if (CurrentSession != null)
+        {
+            Logger.Log($"{CurrentSession.ConnectionHandler.PlayerName} logged out");
+
+            await CurrentSession.ConnectionHandler.Disconnect();
+
+            var result = await ProtectedSessionStore.GetAsync<Guid>("CurrentPlayer");
+            if (result.Success)
+            {
+                Guid sessionId = result.Value;
+
+                await ProtectedSessionStore.DeleteAsync("CurrentPlayer");
+                SessionManager.RemoveSession(sessionId);
+            }
+        }
+
+        Nav.NavigateTo("/", true);
+    }
+}
