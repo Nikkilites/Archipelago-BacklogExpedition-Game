@@ -70,7 +70,8 @@ h1:focus {
     }
 
     .button:active {
-        background: #ddd;
+        background: #c7e0ff;
+        transform: scale(0.99);
     }
 
     .button:disabled {
