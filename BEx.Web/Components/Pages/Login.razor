@@ -44,9 +44,6 @@
 
         try
         {
-            HostPort = await GetLastSessionPort();
-            PlayerName = await GetLastSessionPlayer();
-
             var result = await ProtectedSessionStore.GetAsync<Guid>("CurrentPlayer");
 
             if (result.Success)
@@ -69,6 +66,10 @@
         {
             await ProtectedSessionStore.DeleteAsync("CurrentPlayer");
         }
+
+        HostPort = await GetLastSessionPort();
+        PlayerName = await GetLastSessionPlayer();
+        StateHasChanged();
     }
 
     private async Task<string> GetLastSessionPlayer()
@@ -103,8 +104,8 @@
     {
         Guid sessionId = Guid.NewGuid();
 
-        await ProtectedLocalStore.SetAsync("hostPort", HostPort);
-        await ProtectedLocalStore.SetAsync("playerName", PlayerName);
+        await ProtectedLocalStore.SetAsync("LastHost", HostPort);
+        await ProtectedLocalStore.SetAsync("LastPlayer", PlayerName);
 
         GameSession session = SessionManager.CreateSession(
             HostPort!,
