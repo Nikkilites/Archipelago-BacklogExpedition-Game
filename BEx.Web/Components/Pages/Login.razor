@@ -38,17 +38,15 @@
     string? PlayerName = "";
     string? Password = "";
 
-    protected override async Task OnInitializedAsync()
-    {
-        HostPort = await GetLastSessionPort();
-        PlayerName = await GetLastSessionPlayer();
-    }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return;
 
         try
         {
+            HostPort = await GetLastSessionPort();
+            PlayerName = await GetLastSessionPlayer();
+
             var result = await ProtectedSessionStore.GetAsync<Guid>("CurrentPlayer");
 
             if (result.Success)
@@ -92,7 +90,6 @@
         try
         {
             var result = await ProtectedLocalStore.GetAsync<String>("LastHost");
-
             return result.Success ? result.Value : string.Empty;
         }
         catch (CryptographicException)
