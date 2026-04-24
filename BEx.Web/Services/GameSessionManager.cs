@@ -46,7 +46,7 @@ namespace BEx.Web.Services
 
             foreach (var pair in _sessions)
             {
-                if (now - pair.Value.LastSeen > TimeSpan.FromMinutes(5))
+                if (now - pair.Value.LastSeen > TimeSpan.FromHours(4))
                 {
                     RemoveSession(pair.Key);
                 }
