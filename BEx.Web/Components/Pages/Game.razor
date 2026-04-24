@@ -11,6 +11,10 @@
 
 @if (CurrentSession == null || !CurrentSession.ConnectionHandler.Connected)
 {
+    <div class="connected-row px-4">
+        <div class="title-text">Backlog Expedition</div>
+    </div>
+
     <div class="loading">Waiting for Server...</div>
 }
 else
