@@ -10,33 +10,42 @@
     <div class="title-text">Backlog Expedition</div>
 </div>
 
-<div class="login-container">
-    <h2>Archipelago Login</h2>
+@if (!_isLoaded)
+{
+    <div class="loading">Waiting for Server...</div>
+}
+else
+{
+    <div class="login-container">
+        <h2>Archipelago Login</h2>
 
-    <div class="form-group">
-        <label>Host and Port</label>
-        <input @bind="HostPort" class="form-control" placeholder="Example: archipelago.gg:12345" />
+        <div class="form-group">
+            <label>Host and Port</label>
+            <input @bind="HostPort" class="form-control" placeholder="Example: archipelago.gg:12345" />
+        </div>
+
+        <div class="form-group">
+            <label>Player Name</label>
+            <input @bind="PlayerName" class="form-control" placeholder="Example: MyBExName" />
+        </div>
+
+        <div class="form-group">
+            <label>Password</label>
+            <input @bind="Password" type="password" class="form-control" placeholder="Leave blank if no password" />
+        </div>
+
+        <button class="button" @onclick="LoginAndConnect">
+            Login & Connect
+        </button>
     </div>
-
-    <div class="form-group">
-        <label>Player Name</label>
-        <input @bind="PlayerName" class="form-control" placeholder="Example: MyBExName" />
-    </div>
-
-    <div class="form-group">
-        <label>Password</label>
-        <input @bind="Password" type="password" class="form-control" placeholder="Leave blank if no password" />
-    </div>
-
-    <button class="button" @onclick="LoginAndConnect">
-        Login & Connect
-    </button>
-</div>
+}
 
 @code {
     string? HostPort = "";
     string? PlayerName = "";
     string? Password = "";
+
+    private bool _isLoaded = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -69,6 +78,7 @@
 
         HostPort = await GetLastSessionPort();
         PlayerName = await GetLastSessionPlayer();
+        _isLoaded = true;
         StateHasChanged();
     }
 
