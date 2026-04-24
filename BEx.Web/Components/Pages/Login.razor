@@ -38,6 +38,11 @@
     string? PlayerName = "";
     string? Password = "";
 
+    protected override async Task OnInitializedAsync()
+    {
+        HostPort = await GetLastSessionPort();
+        PlayerName = await GetLastSessionPlayer();
+    }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return;
@@ -68,9 +73,26 @@
         }
     }
 
+    private async Task<string> GetLastSessionPlayer()
+    {
+        var result = await ProtectedLocalStore.GetAsync<String>("LastPlayer");
+
+        return result.Success ? result.Value : string.Empty;
+    }
+
+    private async Task<string> GetLastSessionPort()
+    {
+        var result = await ProtectedLocalStore.GetAsync<String>("LastHost");
+
+        return result.Success ? result.Value : string.Empty;
+    }
+
     private async Task LoginAndConnect()
     {
         Guid sessionId = Guid.NewGuid();
+
+        await ProtectedLocalStore.SetAsync("hostPort", HostPort);
+        await ProtectedLocalStore.SetAsync("playerName", PlayerName);
 
         GameSession session = SessionManager.CreateSession(
             HostPort!,
