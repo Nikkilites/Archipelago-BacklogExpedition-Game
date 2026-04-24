@@ -75,16 +75,31 @@
 
     private async Task<string> GetLastSessionPlayer()
     {
-        var result = await ProtectedLocalStore.GetAsync<String>("LastPlayer");
-
-        return result.Success ? result.Value : string.Empty;
+        try
+        {
+            var result = await ProtectedLocalStore.GetAsync<String>("LastPlayer");
+            return result.Success ? result.Value : string.Empty;
+        }
+        catch (CryptographicException)
+        {
+            await ProtectedLocalStore.DeleteAsync("LastPlayer");
+            return string.Empty;
+        }
     }
 
     private async Task<string> GetLastSessionPort()
     {
-        var result = await ProtectedLocalStore.GetAsync<String>("LastHost");
+        try
+        {
+            var result = await ProtectedLocalStore.GetAsync<String>("LastHost");
 
-        return result.Success ? result.Value : string.Empty;
+            return result.Success ? result.Value : string.Empty;
+        }
+        catch (CryptographicException)
+        {
+            await ProtectedLocalStore.DeleteAsync("LastHost");
+            return string.Empty;
+        }
     }
 
     private async Task LoginAndConnect()
