@@ -33,8 +33,6 @@ namespace BEx.Core
             Treasures = rawData.mcguffins;
 
             StoryData = _loader.LoadStory();
-
-            _logger.Log("Loaded Data Storage into Session");
         }
 
         private List<string> CreateContainerNames(GameData rawData, List<string> regions)

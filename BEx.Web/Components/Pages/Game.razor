@@ -319,7 +319,7 @@ else
         var region = CurrentSession.RegionHandler.Regions.FirstOrDefault(r => r.Name == SelectedSidebarItem);
         if (region != null)
         {
-            Logger.Log($"Send Location: {location.Name}");
+            Logger.Log($"{PlayerName} sent location: {location.Name}");
             region.CheckLocation(location);
 
             StateHasChanged();
@@ -383,7 +383,7 @@ else
                     };
 
                 _ = CreateNotification(notification);
-                Logger.Log($"Hint could not be purchased");
+                Logger.Log($"Hint could not be purchased by {PlayerName}");
             }
         }
         else
@@ -395,7 +395,7 @@ else
                 };
 
             _ = CreateNotification(notification);
-            Logger.Log($"Hint could not be purchased");
+            Logger.Log($"Hint could not be purchased by {PlayerName}");
         }
     }
 

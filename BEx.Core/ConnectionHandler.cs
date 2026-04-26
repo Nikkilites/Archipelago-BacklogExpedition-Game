@@ -117,11 +117,7 @@ namespace BEx.Core
                 return;
             }
 
-            _logger.Log($"Sending location with id: {apId} to server");
-
             await session.Locations.CompleteLocationChecksAsync(apId);
-
-            _logger.Log($"Location {apId} sent successfully.");
         }
 
         public async void SendLocations(List<string> locations)
@@ -133,11 +129,7 @@ namespace BEx.Core
 
             long[] apIds = [.. locations.Select(x => session.Locations.GetLocationIdFromName(gameName, x))];
 
-            _logger.Log($"Sending locations with ids: {string.Join(", ", apIds)} to server.");
-
             await session.Locations.CompleteLocationChecksAsync(apIds);
-
-            _logger.Log($"Locations {string.Join(", ", apIds)} sent successfully.");
         }
 
         public void SendGoal()
@@ -146,8 +138,6 @@ namespace BEx.Core
             {
                 Status = ArchipelagoClientState.ClientGoal
             };
-
-            _logger.Log($"Sending goal to server");
 
             session.Socket.SendPacket(statusUpdatePacket);
         }
@@ -182,7 +172,6 @@ namespace BEx.Core
 
         public void SendLocationHint(long id)
         {
-            _logger.Log($"Send location hint for location with id: {id} to server");
             session.Hints.CreateHints(HintStatus.Unspecified, id);
         }
 
