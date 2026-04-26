@@ -332,7 +332,12 @@ else
                 DotColor = dotColor
             };
 
-            CurrentSessionEntry?.RecentLocationsSent.Add(notification);
+            var recentLocations = CurrentSessionEntry?.RecentLocationsSent;
+            recentLocations.Add(notification);
+            if (recentLocations.Count > 5)
+            {
+                recentLocations.RemoveAt(0);
+            }
 
             _ = CreateNotification(notification);
 
