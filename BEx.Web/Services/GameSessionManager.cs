@@ -40,17 +40,43 @@ namespace BEx.Web.Services
             }
         }
 
-        public void CleanupExpiredSessions()
+        public async Task CleanupExpiredSessions()
         {
             var now = DateTime.UtcNow;
+            var snapshot = _sessions.ToList();
 
-            foreach (var pair in _sessions)
+            foreach (var pair in snapshot)
             {
-                if (now - pair.Value.LastSeen > TimeSpan.FromHours(4))
+                var player = pair.Value.Session.ConnectionHandler.PlayerName;
+
+                Console.WriteLine(
+                    $"{player} was last seen {FormatTimeAgo(pair.Value.LastSeen)}"
+                );
+
+                if (now - pair.Value.LastSeen > TimeSpan.FromHours(3))
                 {
-                    RemoveSession(pair.Key);
+                    Console.WriteLine(
+                        $"[CLEANUP] {player} removed (last seen {FormatTimeAgo(pair.Value.LastSeen)})"
+                    );
+                    await RemoveSession(pair.Key);
                 }
             }
+        }
+
+        private static string FormatTimeAgo(DateTime lastSeen)
+        {
+            var diff = DateTime.UtcNow - lastSeen;
+
+            if (diff.TotalSeconds < 60)
+                return $"{(int)diff.TotalSeconds}s ago";
+
+            if (diff.TotalMinutes < 60)
+                return $"{(int)diff.TotalMinutes}m ago";
+
+            if (diff.TotalHours < 24)
+                return $"{(int)diff.TotalHours}h ago";
+
+            return $"{(int)diff.TotalDays}d ago";
         }
 
         public GameSession? CreateSession(
