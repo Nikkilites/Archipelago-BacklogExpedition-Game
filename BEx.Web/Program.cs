@@ -9,10 +9,19 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+// Determine data protection keys directory based on environment
+var keyDirectory = builder.Environment.IsProduction()
+    ? "/mnt/data-protection" // Render persistent disk mount path
+    : "/home/appuser/.aspnet/DataProtection-Keys"; // Docker Desktop local path
+
+// Ensure directory exists
+Directory.CreateDirectory(keyDirectory);
+
 builder.Services
     .AddDataProtection()
     .SetApplicationName("BEx-Web")
-    .PersistKeysToFileSystem(new DirectoryInfo("/home/appuser/.aspnet/DataProtection-Keys"));
+    .PersistKeysToFileSystem(new DirectoryInfo(keyDirectory))
+    .SetDefaultKeyLifetime(TimeSpan.FromDays(90));
 
 builder.Services.AddSingleton<GameSessionManager>();
 builder.Services.AddHostedService<SessionCleanupService>();
