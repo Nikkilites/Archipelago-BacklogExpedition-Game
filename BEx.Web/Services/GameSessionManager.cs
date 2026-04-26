@@ -109,11 +109,19 @@ namespace BEx.Web.Services
                 };
 
                 Dictionary<string, object> slotData = session.ConnectionHandler.SlotData;
-                session.GoalHandler.TreasuresToGoal = Convert.ToInt32(slotData["beaten_to_goal"]);
-                //_session.RegionHandler.RunesRequired = Convert.ToInt32(slotData["runes_required"]);
-                if (slotData.TryGetValue("runes_required", out var value))
+
+                if (slotData.TryGetValue("beaten_to_goal", out var beatVal))
                 {
-                    session.RegionHandler.RunesRequired = Convert.ToInt32(value);
+                    session.GoalHandler.TreasuresToGoal = Convert.ToInt32(beatVal);
+                }
+                else if (slotData.TryGetValue("treasures_to_goal", out var treVal))
+                {
+                    session.GoalHandler.TreasuresToGoal = Convert.ToInt32(treVal);
+                }
+
+                if (slotData.TryGetValue("runes_required", out var runeVal))
+                {
+                    session.RegionHandler.RunesRequired = Convert.ToInt32(runeVal);
                 }
                 else
                 {
