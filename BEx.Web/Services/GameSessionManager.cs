@@ -12,7 +12,7 @@ namespace BEx.Web.Services
         {
             if (_sessions.TryGetValue(sessionId, out var entry))
             {
-                entry.LastSeen = DateTime.UtcNow;
+                entry.SetSessionActivity();
                 return entry.Session;
             }
 
@@ -23,7 +23,7 @@ namespace BEx.Web.Services
         {
             if (_sessions.TryGetValue(sessionId, out var entry))
             {
-                entry.LastSeen = DateTime.UtcNow;
+                entry.SetSessionActivity();
                 return entry;
             }
 
@@ -156,5 +156,10 @@ namespace BEx.Web.Services
         public GameSession Session { get; set; } = default!;
         public DateTime LastSeen { get; set; } = DateTime.UtcNow;
         public List<Notification> RecentLocationsSent { get; } = new();
+
+        public void SetSessionActivity()
+        {
+            LastSeen = DateTime.UtcNow;
+        }
     }
 }

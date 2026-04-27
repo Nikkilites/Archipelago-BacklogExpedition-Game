@@ -317,6 +317,8 @@ else
 
     void SendCheck(Location location)
     {
+        CurrentSessionEntry?.SetSessionActivity();
+
         var region = CurrentSession.RegionHandler.Regions.FirstOrDefault(r => r.Name == SelectedSidebarItem);
         if (region != null)
         {
@@ -348,6 +350,8 @@ else
 
     void SendHint()
     {
+        CurrentSessionEntry?.SetSessionActivity();
+
         int hintCost = CurrentSession.HintHandler.GetHintCost();
         if (CurrentSession.ItemHandler.TrashAvailable >= hintCost)
         {
@@ -424,6 +428,8 @@ else
 
     async Task SendTextMessage()
     {
+        CurrentSessionEntry?.SetSessionActivity();
+
         if (!string.IsNullOrWhiteSpace(CurrentInput))
         {
             _textClient.SendMessageToServer(CurrentSession, CurrentInput);
