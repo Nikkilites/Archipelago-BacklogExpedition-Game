@@ -30,7 +30,7 @@ namespace BEx.Core
 
         public bool Connect(string server, string player, string pass)
         {
-            _logger.Log($"Will try to connect to server with server: {server}, player: {player}, password: {pass}");
+            _logger.Log($"[ARCHIPELAGOSESSION] Will try to connect to server with server: {server}, player: {player}, password: {pass}");
 
             LoginResult result;
 
@@ -51,7 +51,7 @@ namespace BEx.Core
             if (!result.Successful)
             {
                 LoginFailure failure = (LoginFailure)result;
-                string errorMessage = $"Failed to Connect to {server} as {player}:";
+                string errorMessage = $"[ARCHIPELAGOSESSION] Failed to Connect to {server} as {player}:";
                 foreach (string error in failure.Errors)
                 {
                     errorMessage += $"\n    {error}";
@@ -72,7 +72,7 @@ namespace BEx.Core
 
             PlayerName = player;
 
-            _logger.Log($"Successfully connected to {server} as {player}.");
+            _logger.Log($"[ARCHIPELAGOSESSION] Successfully connected to {server} as {player}.");
 
             return true;
         }
@@ -93,7 +93,7 @@ namespace BEx.Core
             if (Connected)
             {
                 reason += $"\n    Called from OnDisconnect";
-                _logger.Log($"{_gameSession.ConnectionHandler.PlayerName} Disconnected {reason}");
+                _logger.Log($"[ARCHIPELAGOSESSION] {_gameSession.ConnectionHandler.PlayerName} Disconnected {reason}");
                 Connected = false;
                 await Disconnect();
             }
@@ -104,7 +104,7 @@ namespace BEx.Core
             if (Connected)
             {
                 message += $"\n    Called from OnError";
-                _logger.Log($"{_gameSession.ConnectionHandler.PlayerName} Disconnected {message}");
+                _logger.Log($"[ARCHIPELAGOSESSION] {_gameSession.ConnectionHandler.PlayerName} Disconnected {message}");
                 Connected = false;
                 await Disconnect();
             }

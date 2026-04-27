@@ -50,13 +50,13 @@ namespace BEx.Web.Services
                 var player = pair.Value.Session.ConnectionHandler.PlayerName;
 
                 Console.WriteLine(
-                    $"{player} was last seen {FormatTimeAgo(pair.Value.LastSeen)}"
+                    $"[CLEANUP] {player} was last seen {FormatTimeAgo(pair.Value.LastSeen)}"
                 );
 
                 if (now - pair.Value.LastSeen > TimeSpan.FromHours(3))
                 {
                     Console.WriteLine(
-                        $"[CLEANUP] {player} removed (last seen {FormatTimeAgo(pair.Value.LastSeen)})"
+                        $"\n    {player} removed due to inactivity"
                     );
                     await RemoveSession(pair.Key);
                 }
@@ -136,7 +136,7 @@ namespace BEx.Web.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Session creation failed: {ex.Message}");
+                Console.WriteLine($"{player}'s session creation failed: {ex.Message}");
                 return null;
             }
         }
