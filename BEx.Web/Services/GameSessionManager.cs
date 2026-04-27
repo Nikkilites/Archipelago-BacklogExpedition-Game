@@ -57,7 +57,7 @@ namespace BEx.Web.Services
                     $"[CLEANUP] {player} was last seen {FormatTimeAgo(pair.Value.LastSeen)}"
                 );
 
-                if (now - pair.Value.LastSeen > TimeSpan.FromHours(3))
+                if (now - pair.Value.LastSeen > TimeSpan.FromHours(2))
                 {
                     Console.WriteLine(
                         $"\n[CLEANUP]        {player} was inactive"
