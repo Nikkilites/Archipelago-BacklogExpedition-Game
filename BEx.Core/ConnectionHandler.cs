@@ -30,7 +30,7 @@ namespace BEx.Core
 
         public bool Connect(string server, string player, string pass)
         {
-            _logger.Log($"[ARCHIPELAGOSESSION] Will try to connect to server with server: {server}, player: {player}, password: {pass}");
+            _logger.Log($"[ARCHIPELAGO] Will try to connect to server with server: {server}, player: {player}, password: {pass}");
 
             LoginResult result;
 
@@ -51,7 +51,7 @@ namespace BEx.Core
             if (!result.Successful)
             {
                 LoginFailure failure = (LoginFailure)result;
-                string errorMessage = $"[ARCHIPELAGOSESSION] Failed to Connect to {server} as {player}:";
+                string errorMessage = $"[ARCHIPELAGO] Failed to Connect to {server} as {player}:";
                 foreach (string error in failure.Errors)
                 {
                     errorMessage += $"\n    {error}";
@@ -72,7 +72,7 @@ namespace BEx.Core
 
             PlayerName = player;
 
-            _logger.Log($"[ARCHIPELAGOSESSION] Successfully connected to {server} as {player}.");
+            _logger.Log($"[ARCHIPELAGO] Successfully connected to {server} as {player}.");
 
             return true;
         }
@@ -92,8 +92,8 @@ namespace BEx.Core
         {
             if (Connected)
             {
-                reason += $"\n    Called from OnDisconnect";
-                _logger.Log($"[ARCHIPELAGOSESSION] {_gameSession.ConnectionHandler.PlayerName} Disconnected {reason}");
+                reason += $"\n[ARCHIPELAGO]    Called from OnDisconnect";
+                _logger.Log($"[ARCHIPELAGO] {_gameSession.ConnectionHandler.PlayerName} Disconnected {reason}");
                 Connected = false;
                 await Disconnect();
             }
@@ -103,8 +103,8 @@ namespace BEx.Core
         {
             if (Connected)
             {
-                message += $"\n    Called from OnError";
-                _logger.Log($"[ARCHIPELAGOSESSION] {_gameSession.ConnectionHandler.PlayerName} Disconnected {message}");
+                message += $"\n[ARCHIPELAGO]    Called from OnError";
+                _logger.Log($"[ARCHIPELAGO] {_gameSession.ConnectionHandler.PlayerName} Disconnected {message}");
                 Connected = false;
                 await Disconnect();
             }
@@ -192,7 +192,7 @@ namespace BEx.Core
 
         public void UpdateServerDataStorage(string key, int value)
         {
-            _logger.Log($"Update Server Data Storage {key} to {value}");
+            _logger.Log($"[ARCHIPELAGO] Update Server Data Storage {key} to {value}");
             session.DataStorage[key] = value;
         }
 
@@ -202,14 +202,14 @@ namespace BEx.Core
             {
                 if (!Connected)
                 {
-                    _textClient.ShowMessage($"Failed to send '{message}' due to disconnect.");
+                    _textClient.ShowMessage($"Failed to send message due to disconnect.");
                     return;
                 }
                 session.Socket.SendPacketAsync(new SayPacket() { Text = message });
             }
             catch (Exception e)
             {
-                _logger.Log($"Error when sending message {e}");
+                _logger.Log($"[ARCHIPELAGO] Error when sending message {e}");
             }
         }
 
@@ -221,7 +221,7 @@ namespace BEx.Core
             }
             catch (Exception e)
             {
-                _logger.Log($"Error when parsing received message {e}");
+                _logger.Log($"[ARCHIPELAGO] Error when parsing received message {e}");
             }
         }
     }
