@@ -469,10 +469,20 @@ else
                 Guid sessionId = result.Value;
 
                 await ProtectedSessionStore.DeleteAsync("CurrentPlayer");
-                SessionManager.RemoveSession(sessionId);
+                await SessionManager.RemoveSession(sessionId);
             }
         }
 
-        Nav.NavigateTo("/", true);
+        try
+        {
+            await InvokeAsync(() =>
+            {
+                Nav.NavigateTo("/", true);
+            });
+        }
+        catch (TaskCanceledException)
+        {
+            // expected if circuit is already gone
+        }
     }
 }
