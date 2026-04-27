@@ -106,6 +106,11 @@ namespace BEx.Web.Services
                     return null;
                 }
 
+                session.ConnectionHandler.Disconnected += async () =>
+                {
+                    await RemoveSession(sessionId);
+                };
+
                 _sessions[sessionId] = new SessionEntry
                 {
                     Session = session,

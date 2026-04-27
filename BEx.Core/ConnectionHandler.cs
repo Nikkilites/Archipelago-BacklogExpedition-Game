@@ -12,6 +12,7 @@ namespace BEx.Core
         private readonly GameSession _gameSession;
         private readonly ILogger _logger;
         private readonly ITextClient _textClient;
+        public event Func<Task>? Disconnected;
 
         public ConnectionHandler(GameSession session, ILogger logger, ITextClient textClient)
         {
@@ -96,6 +97,10 @@ namespace BEx.Core
                 _logger.Log($"[ARCHIPELAGO] {_gameSession.ConnectionHandler.PlayerName} Disconnected {reason}");
                 Connected = false;
                 await Disconnect();
+
+
+                if (Disconnected != null)
+                    await Disconnected.Invoke();
             }
         }
 
@@ -107,6 +112,10 @@ namespace BEx.Core
                 _logger.Log($"[ARCHIPELAGO] {_gameSession.ConnectionHandler.PlayerName} Disconnected {message}");
                 Connected = false;
                 await Disconnect();
+
+
+                if (Disconnected != null)
+                    await Disconnected.Invoke();
             }
         }
 
