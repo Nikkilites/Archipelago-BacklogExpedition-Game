@@ -21,7 +21,7 @@ else
 {
     <div class="connected-row px-4">
         <div class="title-text">Backlog Expedition</div>
-        <div class="text">Welcome @CurrentSession.ConnectionHandler.PlayerName, you have been connected to Archipelago!</div>
+        <div class="text">Welcome @PlayerName, you have been connected to Archipelago!</div>
         <button class="logout-button button button-small" @onclick="Logout">
             Logout
         </button>
@@ -265,6 +265,7 @@ else
                 Guid sessionId = result.Value;
                 CurrentSessionEntry = SessionManager.GetSessionEntry(sessionId);
                 CurrentSession = CurrentSessionEntry?.Session;
+                PlayerName = CurrentSession.ConnectionHandler.PlayerName;
             }
         }
         catch (CryptographicException)
@@ -377,7 +378,7 @@ else
                     };
 
                 _ = CreateNotification(notification);
-                Logger.Log($"{CurrentSession.ConnectionHandler.PlayerName} puchased a Hint");
+                Logger.Log($"{PlayerName} puchased a Hint");
             }
             else
             {
@@ -458,7 +459,7 @@ else
     {
         if (CurrentSession != null)
         {
-            Logger.Log($"{CurrentSession.ConnectionHandler.PlayerName} logged out");
+            Logger.Log($"{PlayerName} logged out");
 
             await CurrentSession.ConnectionHandler.Disconnect();
 
