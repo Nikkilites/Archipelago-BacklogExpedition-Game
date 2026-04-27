@@ -15,8 +15,15 @@
         public string TreasureAsciiFileName => $"treasure_{TreasureName.ToUpper().Replace("'", "").Replace(" ", "")}";
         public void CheckLocation(Location location)
         {
+            bool snapshot = TreasureFound;
+
             _session.ConnectionHandler.SendLocation(location.Id);
             Locations.Remove(location);
+
+            if ((snapshot == false) && (TreasureFound == true))
+            {
+                _session.ConnectionHandler.SendMessage($"Logmundr: I have found the {TreasureName} of the {Name} Island! Onwards!");
+            }
         }
     }
 }
