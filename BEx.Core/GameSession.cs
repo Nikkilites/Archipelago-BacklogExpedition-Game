@@ -14,11 +14,11 @@
         public GameSession(ILogger logger, ITextClient textClient, IMessageService messages, IDataLoader loader)
         {
             ConnectionHandler = new ConnectionHandler(this, logger, textClient);
-            DataStorageHandler = new DataStorageHandler(logger, loader);
+            DataStorageHandler = new DataStorageHandler(loader);
             ItemHandler = new ItemHandler(this, logger);
             RegionHandler = new RegionHandler(this, logger);
             GoalHandler = new GoalHandler(this, logger);
-            HintHandler = new HintHandler(this, logger);
+            HintHandler = new HintHandler(this);
             TextClient = textClient;
         }
     }

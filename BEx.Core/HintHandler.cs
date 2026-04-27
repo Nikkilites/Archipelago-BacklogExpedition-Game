@@ -3,10 +3,9 @@ using Archipelago.MultiClient.Net.Models;
 
 namespace BEx.Core
 {
-    public class HintHandler(GameSession gameSession, ILogger logger)
+    public class HintHandler(GameSession gameSession)
     {
         private readonly GameSession _gameSession = gameSession;
-        private readonly ILogger _logger = logger;
 
 
         private List<Hint>? _allHints;

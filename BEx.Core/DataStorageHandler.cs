@@ -4,7 +4,6 @@ namespace BEx.Core
 {
     public class DataStorageHandler
     {
-        private readonly ILogger _logger;
         private readonly IDataLoader _loader;
 
         public List<string> Regions { get; set; }
@@ -16,9 +15,8 @@ namespace BEx.Core
         public List<string> Entities => Monsters.Concat(Containers).ToList();
         public StoryData StoryData { get; set; }
 
-        public DataStorageHandler(ILogger logger, IDataLoader loader)
+        public DataStorageHandler(IDataLoader loader)
         {
-            _logger = logger;
             _loader = loader;
 
             GameData rawData = _loader.LoadData();
