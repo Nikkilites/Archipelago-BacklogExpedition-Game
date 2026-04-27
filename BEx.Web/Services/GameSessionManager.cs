@@ -37,7 +37,7 @@ namespace BEx.Web.Services
             if (_sessions.TryRemove(sessionId, out var entry))
             {
                 Console.WriteLine(
-                    $"\n[CLEANUP]        {entry.Session.ConnectionHandler.PlayerName} was removed"
+                    $"[CLEANUP]        {entry.Session.ConnectionHandler.PlayerName} was removed"
                 );
 
                 await entry.Session.ConnectionHandler.Disconnect();
@@ -60,7 +60,7 @@ namespace BEx.Web.Services
                 if (now - pair.Value.LastSeen > TimeSpan.FromHours(2))
                 {
                     Console.WriteLine(
-                        $"\n[CLEANUP]        {player} was inactive"
+                        $"[CLEANUP]        {player} was inactive"
                     );
                     await RemoveSession(pair.Key);
                 }
