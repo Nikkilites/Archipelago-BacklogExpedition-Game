@@ -265,7 +265,7 @@ else
                 Guid sessionId = result.Value;
                 CurrentSessionEntry = SessionManager.GetSessionEntry(sessionId);
                 CurrentSession = CurrentSessionEntry?.Session;
-                PlayerName = CurrentSession.ConnectionHandler.PlayerName;
+                PlayerName = CurrentSession?.ConnectionHandler.PlayerName;
             }
         }
         catch (CryptographicException)
