@@ -4,6 +4,8 @@ namespace BEx.Web.Services
 {
     public class WebTextClient : ITextClient
     {
+        private readonly object _lock = new();
+
         private List<string> textLines = new List<string>();
         private const int MAX_TEXT_LINES = 80;
 
@@ -11,7 +13,10 @@ namespace BEx.Web.Services
 
         public IReadOnlyList<string> GetLines()
         {
-            return textLines;
+            lock (_lock)
+            {
+                return textLines.ToArray();
+            }
         }
 
         public void ShowMessage(string message)
@@ -19,12 +24,15 @@ namespace BEx.Web.Services
             if (string.IsNullOrWhiteSpace(message))
                 return;
 
-            if (textLines.Count == MAX_TEXT_LINES)
+            lock (_lock)
             {
-                textLines.RemoveAt(0);
-            }
+                if (textLines.Count >= MAX_TEXT_LINES)
+                {
+                    textLines.RemoveAt(0);
+                }
 
-            textLines.Add(message);
+                textLines.Add(message);
+            }
 
             OnMessageAdded?.Invoke();
         }
