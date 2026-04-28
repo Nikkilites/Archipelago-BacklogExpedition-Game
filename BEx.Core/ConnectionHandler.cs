@@ -191,9 +191,9 @@ namespace BEx.Core
             session.Hints.CreateHints(HintStatus.Unspecified, id);
         }
 
-        public Hint[] GetHints()
+        public async Task<Hint[]> GetHintsAsync()
         {
-            return session.Hints.GetHints(GetThisSlotId());
+            return await session.Hints.GetHintsAsync(GetThisSlotId());
         }
 
         public async Task<Dictionary<long, ScoutedItemInfo>> ScoutLocations(long[] ids)
@@ -229,11 +229,18 @@ namespace BEx.Core
             }
         }
 
-        public void OnMessageReceived(LogMessage message)
+        public async void OnMessageReceived(LogMessage message)
         {
             try
             {
-                _textClient.ShowMessage(message.ToString());
+                var text = message.ToString();
+
+                _textClient.ShowMessage(text);
+
+                if (text.StartsWith("[Hint]", StringComparison.OrdinalIgnoreCase))
+                {
+                    await _gameSession.HintHandler.UpdateHints();
+                }
             }
             catch (Exception e)
             {

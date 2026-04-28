@@ -189,8 +189,6 @@ else
                             <h5>You have found the treasure on this island!</h5>
                         }
 
-                        List<Hint> hints = @CurrentSession.HintHandler.AllHints.Where(h => h.FindingPlayer == CurrentSession.ConnectionHandler.GetThisSlotId()).ToList();
-
                         @foreach (var location in region.Locations)
                         {
                             if (!LocationChecked.ContainsKey(location))
@@ -253,6 +251,9 @@ else
     private SessionEntry? CurrentSessionEntry;
     private GameSession? CurrentSession;
 
+    private List<Hint> hints = new();
+    private bool _isRetrievingHints = false;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return;
@@ -273,8 +274,11 @@ else
             await ProtectedSessionStore.DeleteAsync("CurrentPlayer");
         }
 
-        if (CurrentSessionEntry != null && CurrentSession.ConnectionHandler.Connected)
+        if (CurrentSessionEntry != null && CurrentSession != null && CurrentSession.ConnectionHandler.Connected)
         {
+            CurrentSession.HintHandler.OnHintsUpdated += HandleHintsUpdated;
+            hints = await CurrentSession.HintHandler.GetAllHintsAsync();
+
             foreach (var region in CurrentSession.RegionHandler.AvailableRegions)
                 foreach (var location in region.Locations)
                     LocationChecked[location] = false;
@@ -290,6 +294,7 @@ else
         {
             await ReloadIfSessionMissingAsync();
         }
+
         StateHasChanged();
     }
 
@@ -307,6 +312,11 @@ else
 
     public void Dispose()
     {
+        if (CurrentSession != null)
+        {
+            CurrentSession.HintHandler.OnHintsUpdated -= HandleHintsUpdated;
+        }
+
         if (_subscribedTextClient && _textClient != null)
         {
             _textClient.OnMessageAdded -= HandleNewMessage;
@@ -355,7 +365,7 @@ else
         int hintCost = CurrentSession.HintHandler.GetHintCost();
         if (CurrentSession.ItemHandler.TrashAvailable >= hintCost)
         {
-            List<long> alreadyHintedLocationIds = CurrentSession.HintHandler.AllHints
+            List<long> alreadyHintedLocationIds = hints
                 .Where(h => h.FindingPlayer == CurrentSession.ConnectionHandler.GetThisSlotId())
                 .Where(h => h.Status == HintStatus.Unspecified)
                 .Select(h => h.LocationId)
@@ -407,6 +417,13 @@ else
             _ = CreateNotification(notification);
             Logger.Log($"{PlayerName} could not purchase Hint");
         }
+    }
+
+    private void HandleHintsUpdated()
+    {
+        hints = CurrentSession?.HintHandler.AllHints ?? new List<Hint>();
+        Logger.Log($"{PlayerName}'s Server Hints were updated");
+        InvokeAsync(StateHasChanged);
     }
 
     string CurrentInput = "";

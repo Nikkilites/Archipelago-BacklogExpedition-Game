@@ -7,23 +7,45 @@ namespace BEx.Core
     {
         private readonly GameSession _gameSession = gameSession;
 
+        public List<Hint> AllHints { get; private set; } = new();
+        public event Action? OnHintsUpdated;
 
-        private List<Hint>? _allHints;
         private DateTime _lastFetch = DateTime.MinValue;
-        private readonly TimeSpan _cacheDuration = TimeSpan.FromSeconds(60);
+        private readonly TimeSpan _cacheDuration = TimeSpan.FromSeconds(10);
 
-        public List<Hint> AllHints
+        private readonly SemaphoreSlim _updateLock = new(1, 1);
+
+        public async Task UpdateHints()
         {
-            get
-            {
-                if (_allHints == null || DateTime.UtcNow - _lastFetch > _cacheDuration)
-                {
-                    _allHints = _gameSession.ConnectionHandler.GetHints().ToList();
-                    _lastFetch = DateTime.UtcNow;
-                }
+            await _updateLock.WaitAsync();
 
-                return _allHints;
+            try
+            {
+                if (DateTime.UtcNow - _lastFetch <= _cacheDuration)
+                    return;
+
+                AllHints = await GetAllHintsAsync();
+                OnHintsUpdated?.Invoke();
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Hint refresh failed: {ex}");
+            }
+            finally
+            {
+                _updateLock.Release();
+            }
+        }
+
+        public async Task<List<Hint>> GetAllHintsAsync()
+        {
+            if (DateTime.UtcNow - _lastFetch > _cacheDuration)
+            {
+                AllHints = (await _gameSession.ConnectionHandler.GetHintsAsync()).ToList();
+                _lastFetch = DateTime.UtcNow;
+            }
+
+            return AllHints;
         }
 
         public string GetHintColor(ItemFlags flags)
