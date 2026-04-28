@@ -82,8 +82,15 @@ namespace BEx.Core
         {
             if (Connected)
             {
-                await session.Socket.DisconnectAsync();
                 Connected = false;
+
+                session.Items.ItemReceived -= _gameSession.ItemHandler.OnItemReceived; 
+                session.Socket.SocketClosed -= OnDisconnect; 
+                session.Socket.ErrorReceived -= OnError; 
+                session.MessageLog.OnMessageReceived -= OnMessageReceived;
+
+                await session.Socket.DisconnectAsync();
+
                 session = null;
                 SlotData = null;
             }
