@@ -4,36 +4,37 @@ namespace BEx.Core
 {
     public class DataStorageHandler
     {
-        private readonly IDataLoader _loader;
-
-        public List<string> Regions { get; set; }
-        public List<string> LocationNames { get; set; }
-        public List<string> Items { get; set; }
-        public List<string> Treasures { get; set; }
-        public List<string> Monsters { get; set; }
-        public List<string> Containers { get; set; }
-        public List<string> Entities => Monsters.Concat(Containers).ToList();
-        public StoryData StoryData { get; set; }
+        public IReadOnlyList<string> Regions { get; }
+        public IReadOnlyList<string> LocationNames { get; }
+        public IReadOnlyList<string> Items { get; }
+        public IReadOnlyList<string> Treasures { get; }
+        public IReadOnlyList<string> Monsters { get; }
+        public IReadOnlyList<string> Containers { get; }
+        public IReadOnlyList<string> Entities { get; }
+        public StoryData StoryData { get; }
 
         public DataStorageHandler(IDataLoader loader)
         {
-            _loader = loader;
+            GameData rawData = loader.LoadData();
 
-            GameData rawData = _loader.LoadData();
+            var regions = new List<string> { "Starting" };
+            regions.AddRange(rawData.extra_regions);
 
-            Regions = new List<string> { "Starting" };
-            Regions.AddRange(rawData.extra_regions);
+            Regions = regions.AsReadOnly();
 
             Monsters = rawData.monsters;
-            Containers = CreateContainerNames(rawData, Regions);
-            LocationNames = CreateLocationNames(rawData, Regions, Containers);
-            Items = CreateItemNames(rawData, Regions);
+            Containers = CreateContainerNames(rawData);
+            LocationNames = CreateLocationNames(rawData);
+            Items = CreateItemNames(rawData);
             Treasures = rawData.mcguffins;
+            Entities = GetEntities();
 
-            StoryData = _loader.LoadStory();
+            StoryData = loader.LoadStory();
         }
 
-        private List<string> CreateContainerNames(GameData rawData, List<string> regions)
+        private List<string> GetEntities() => Monsters.Concat(Containers).ToList();
+
+        private List<string> CreateContainerNames(GameData rawData)
         {
             var containerNames = new List<string>();
 
@@ -48,18 +49,18 @@ namespace BEx.Core
             return containerNames;
         }
 
-        private List<string> CreateLocationNames(GameData rawData, List<string> regions, List<string> containers)
+        private List<string> CreateLocationNames(GameData rawData)
         {
             var locationNames = new List<string>();
 
-            foreach (var region in regions)
+            foreach (var region in Regions)
             {
                 foreach (var monster in rawData.monsters)
                 {
                     locationNames.Add($"Slay the {monster} in {region} Island");
                 }
 
-                foreach (var container in containers)
+                foreach (var container in Containers)
                 {
                     locationNames.Add($"Opened the {container} in {region} Island");
                 }
@@ -68,7 +69,7 @@ namespace BEx.Core
             return locationNames;
         }
 
-        private List<string> CreateItemNames(GameData rawData, List<string> regions)
+        private List<string> CreateItemNames(GameData rawData)
         {
             var ItemNames = new List<string>();
 
@@ -77,7 +78,7 @@ namespace BEx.Core
                 ItemNames.Add(filler);
             }
 
-            foreach (var region in regions)
+            foreach (var region in Regions)
             {
                 ItemNames.Add($"{region} Rune");
             }

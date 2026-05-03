@@ -23,10 +23,7 @@ namespace BEx.Core
 
             List<Region> regions = [];
 
-            List<string> regionNames = _gameSession.DataStorageHandler.Regions;
-            List<string> treasureNames = _gameSession.DataStorageHandler.Treasures;
-
-            foreach (var (regionName, treasureName) in regionNames.Zip(treasureNames))
+            foreach (var (regionName, treasureName) in _gameSession.DataStorageHandler.Regions.Zip(_gameSession.DataStorageHandler.Treasures))
             {
                 List<Location> regionLocations = [.. locations.Where(l => l.Region == regionName)];
 
