@@ -90,7 +90,7 @@ namespace BEx.Core
             {
                 _trashAcquired++;
             }
-            _logger.Log($"{_session.ConnectionHandler.PlayerName} received item: {item}");
+            // _logger.Log($"{_session.ConnectionHandler.PlayerName} received item: {item}");
         }
 
         public void UseTrash(int amount)

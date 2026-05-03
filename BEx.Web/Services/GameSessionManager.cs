@@ -1,5 +1,6 @@
 ﻿using BEx.Core;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using static BEx.Web.Components.Pages.Game;
 
 namespace BEx.Web.Services
@@ -49,6 +50,20 @@ namespace BEx.Web.Services
             var now = DateTime.UtcNow;
             var snapshot = _sessions.ToList();
 
+            void LogMemory(string stage) 
+            { 
+                long managed = GC.GetTotalMemory(false) / 1024 / 1024; 
+                long working = Process.GetCurrentProcess().WorkingSet64 / 1024 / 1024; 
+                
+                Console.WriteLine(
+                    $"[MEMORY] {stage} | Sessions={_sessions.Count} | Managed={managed}MB | WorkingSet={working}MB"
+                ); 
+            }
+
+            LogMemory("BEFORE CLEANUP ");
+
+            int removed = 0;
+
             foreach (var pair in snapshot)
             {
                 var player = pair.Value.Session.ConnectionHandler.PlayerName;
@@ -60,11 +75,21 @@ namespace BEx.Web.Services
                 if (now - pair.Value.LastSeen > TimeSpan.FromHours(2))
                 {
                     Console.WriteLine(
-                        $"[CLEANUP]        {player} was inactive"
+                        $"[CLEANUP]        Removing inactive session: {player}"
                     );
                     await RemoveSession(pair.Key);
+                    removed++;
                 }
             }
+
+            LogMemory("AFTER REMOVAL  "); 
+            
+            // TEMPORARY DIAGNOSTIC ONLY
+            GC.Collect(); 
+            GC.WaitForPendingFinalizers(); 
+            GC.Collect(); 
+            
+            LogMemory("AFTER FORCED GC");
         }
 
         private static string FormatTimeAgo(DateTime lastSeen)
