@@ -18,8 +18,6 @@
             _gameSession.Logger.Log($"{_gameSession.ConnectionHandler.PlayerName} reached goal!");
 
             _gameSession.ConnectionHandler.SendGoal();
-            List<string> goalTexts =
-                _gameSession.DataStorageHandler.StoryData.goal;
 
             GoalReached?.Invoke();
         }
