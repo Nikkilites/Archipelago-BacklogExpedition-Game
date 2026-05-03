@@ -2,35 +2,48 @@
 
 namespace BEx.Core.Model
 {
-    public class Location(string name, int id, string hint)
+    public class Location
     {
-        public string Name { get; set; } = name;
-        public int Id { get; set; } = id;
-        public string Hint { get; set; } = hint;
+        public string Name { get; private set; }
+        public int Id { get; private set; }
+        public string Hint { get; private set; }
         public ScoutedItemInfo? ScoutedInfo { get; set; } = null;
-        public string Region => Name[(Name.LastIndexOf(" in ") + 4)..]
-            .Replace(" Island", "");
-        public string Entity => Name.StartsWith("Slay the ") ? "monster" : "container";
-        public string EntityName
+        public string Region { get; private set; }
+        public string Entity { get; private set; }
+        public string EntityName { get; private set; }
+        public string AsciiFileName { get; private set; }
+
+        public Location(string name, int id, string hint)
         {
-            get
-            {
-                int start = Name.IndexOf("the ", StringComparison.OrdinalIgnoreCase);
-                if (start < 0) return string.Empty;
-                start += "the ".Length;
+            Name = name;
+            Id = id;
+            Hint = hint;
 
-                int end = Name.IndexOf(" in ", start, StringComparison.OrdinalIgnoreCase);
-
-                if (end < 0) return string.Empty;
-
-                string tmpName = Name[start..end].Trim();
-
-                if (Entity == "container")
-                    tmpName = tmpName.Split(" ")[1];
-
-                return tmpName;
-            }
+            Region = GetRegion();
+            Entity = GetEntity();
+            EntityName = GetEntityName();
+            AsciiFileName = GetAsciiFileName();
         }
-        public string AsciiFileName => $"{Entity}_{EntityName.ToUpper()}";
+
+        private string GetAsciiFileName() => $"{Entity}_{EntityName.ToUpper()}";
+        private string GetRegion() => Name[(Name.LastIndexOf(" in ") + 4)..].Replace(" Island", "");
+        private string GetEntity() => Name.StartsWith("Slay the ") ? "monster" : "container";
+        private string GetEntityName()
+        {
+            int start = Name.IndexOf("the ", StringComparison.OrdinalIgnoreCase);
+            if (start < 0) return string.Empty;
+            start += "the ".Length;
+
+            int end = Name.IndexOf(" in ", start, StringComparison.OrdinalIgnoreCase);
+
+            if (end < 0) return string.Empty;
+
+            string tmpName = Name[start..end].Trim();
+
+            if (Entity == "container")
+                tmpName = tmpName.Split(" ")[1];
+
+            return tmpName;
+        }
     }
 }
