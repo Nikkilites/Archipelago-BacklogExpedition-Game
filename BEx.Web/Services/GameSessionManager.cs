@@ -30,9 +30,6 @@ namespace BEx.Web.Services
 
             return null;
         }
-
-        public int GetSessionCount() => _sessions.Count;
-
         public bool HasSession(Guid sessionId) => _sessions.ContainsKey(sessionId);
 
         public async Task RemoveSession(Guid sessionId)
@@ -104,10 +101,9 @@ namespace BEx.Web.Services
             {
                 var logger = services.GetRequiredService<Core.ILogger>();
                 var dataStorageHandler = services.GetRequiredService<DataStorageHandler>();
-                var messages = services.GetRequiredService<IMessageService>();
                 var textClient = new WebTextClient();
 
-                var session = new GameSession(logger, textClient, messages, dataStorageHandler);
+                var session = new GameSession(logger, textClient, dataStorageHandler);
 
                 bool success = session.ConnectionHandler.Connect(server, player, password);
 

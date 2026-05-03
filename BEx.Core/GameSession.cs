@@ -12,7 +12,7 @@
         public ILogger Logger { get; }
 
 
-        public GameSession(ILogger logger, ITextClient textClient, IMessageService messages, DataStorageHandler dataStorageHandler)
+        public GameSession(ILogger logger, ITextClient textClient, DataStorageHandler dataStorageHandler)
         {
             Logger = logger;
             DataStorageHandler = dataStorageHandler;
