@@ -24,9 +24,9 @@ builder.Services
     .SetDefaultKeyLifetime(TimeSpan.FromDays(90));
 
 builder.Services.AddSingleton<GameSessionManager>();
+builder.Services.AddSingleton<BEx.Core.ILogger, WebLogger>();
 builder.Services.AddHostedService<SessionCleanupService>();
 
-builder.Services.AddScoped<BEx.Core.ILogger, WebLogger>();
 builder.Services.AddScoped<IMessageService, WebMessageService>();
 builder.Services.AddScoped<IDataLoader, HttpDataLoader>();
 

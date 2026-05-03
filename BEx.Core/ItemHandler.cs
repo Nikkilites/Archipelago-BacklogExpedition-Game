@@ -5,8 +5,7 @@ namespace BEx.Core
 {
     public class ItemHandler
     {
-        private readonly GameSession _session;
-        private readonly ILogger _logger;
+        private readonly GameSession _gameSession;
 
         private readonly ConcurrentQueue<string> _itemQueue = new();
         private readonly object _lock = new();
@@ -20,25 +19,24 @@ namespace BEx.Core
         {
             get
             {
-                return _session.ConnectionHandler.GetServerDataStorage(trashServerDataStorageKey);
+                return _gameSession.ConnectionHandler.GetServerDataStorage(trashServerDataStorageKey);
             }
             set
             {
-                _session.ConnectionHandler.UpdateServerDataStorage(trashServerDataStorageKey, value);
+                _gameSession.ConnectionHandler.UpdateServerDataStorage(trashServerDataStorageKey, value);
             }
         }
 
         public int TrashAvailable => _trashAcquired - trashUsed;
-        public int TrashInWorld => _session.ConnectionHandler.AllLocationsCount - _session.RegionHandler.Regions.Count;
+        public int TrashInWorld => _gameSession.ConnectionHandler.AllLocationsCount - _gameSession.RegionHandler.Regions.Count;
 
         private string trashServerDataStorageKey = "";
 
-        public ItemHandler(GameSession session, ILogger logger)
+        public ItemHandler(GameSession session)
         {
-            _session = session;
-            _logger = logger;
+            _gameSession = session;
 
-            foreach (var region in _session.DataStorageHandler.Regions)
+            foreach (var region in _gameSession.DataStorageHandler.Regions)
                 AvailableRunes[$"{region} Rune"] = 0;
 
             _cts = new CancellationTokenSource();
@@ -98,15 +96,15 @@ namespace BEx.Core
             lock (_lock)
             {
                 trashUsed += amount;
-                _logger.Log($"{_session.ConnectionHandler.PlayerName} used {amount} trash, remaining {TrashAvailable}");
+                _gameSession.Logger.Log($"{_gameSession.ConnectionHandler.PlayerName} used {amount} trash, remaining {TrashAvailable}");
                 OnItemsUpdated?.Invoke(); // notify UI
             }
         }
 
         public void SetupItemHandler()
         {
-            int slotId = _session.ConnectionHandler.GetThisSlotId();
-            string slotName = _session.ConnectionHandler.GetPlayerNameFromSlot(slotId);
+            int slotId = _gameSession.ConnectionHandler.GetThisSlotId();
+            string slotName = _gameSession.ConnectionHandler.GetPlayerNameFromSlot(slotId);
             string key = $"BEx_slot:{slotId}_{slotName}:trash_used";
             trashServerDataStorageKey = key;
         }

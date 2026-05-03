@@ -1,9 +1,8 @@
 ﻿namespace BEx.Core
 {
-    public class GoalHandler(GameSession gameSession, ILogger logger)
+    public class GoalHandler(GameSession gameSession)
     {
         private readonly GameSession _gameSession = gameSession;
-        private readonly ILogger _logger = logger;
 
         public int TreasuresToGoal { get; set; } = 0;
         public int TreasuresFound => _gameSession.RegionHandler.Regions.Count(r => r.TreasureFound);
@@ -16,7 +15,7 @@
 
         private void OnGoalConditionMet()
         {
-            _logger.Log($"{_gameSession.ConnectionHandler.PlayerName} reached goal!");
+            _gameSession.Logger.Log($"{_gameSession.ConnectionHandler.PlayerName} reached goal!");
 
             _gameSession.ConnectionHandler.SendGoal();
             List<string> goalTexts =

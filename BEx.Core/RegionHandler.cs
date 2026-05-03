@@ -5,10 +5,9 @@ using System.Text.Json;
 
 namespace BEx.Core
 {
-    public class RegionHandler(GameSession gameSession, ILogger logger)
+    public class RegionHandler(GameSession gameSession)
     {
         private readonly GameSession _gameSession = gameSession;
-        private readonly ILogger _logger = logger;
 
         public List<Region> Regions { get; set; } = [];
         public List<Region> AvailableRegions => Regions.Where(r => r.RuneReceived).ToList();
@@ -39,7 +38,7 @@ namespace BEx.Core
 
         private async Task<List<Location>> CreateLocations(Dictionary<string, object> slotData)
         {
-            _logger.Log($"{_gameSession.ConnectionHandler.PlayerName}'s Hint Location Data will be processed");
+            _gameSession.Logger.Log($"{_gameSession.ConnectionHandler.PlayerName}'s Hint Location Data will be processed");
 
             Dictionary<int, string> HintData = JsonSerializer.Deserialize<Dictionary<int, string>>(slotData["hint_data"].ToString());
 
