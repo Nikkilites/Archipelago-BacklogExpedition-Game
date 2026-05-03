@@ -26,6 +26,7 @@ builder.Services
 builder.Services.AddSingleton<GameSessionManager>();
 builder.Services.AddSingleton<BEx.Core.ILogger, WebLogger>();
 builder.Services.AddHostedService<SessionCleanupService>();
+builder.Services.AddHostedService<MemoryLoggingService>();
 
 builder.Services.AddScoped<IMessageService, WebMessageService>();
 builder.Services.AddScoped<IDataLoader, HttpDataLoader>();
