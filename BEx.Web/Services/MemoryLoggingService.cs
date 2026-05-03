@@ -4,13 +4,6 @@ namespace BEx.Web.Services
 {
     public class MemoryLoggingService : BackgroundService
     {
-        private readonly GameSessionManager _manager;
-
-        public MemoryLoggingService(GameSessionManager manager)
-        {
-            _manager = manager;
-        }
-
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)
@@ -20,7 +13,7 @@ namespace BEx.Web.Services
                 long working = Process.GetCurrentProcess().WorkingSet64 / 1024 / 1024;
 
                 Console.WriteLine(
-                    $"[MEMORY] Sessions={_manager.GetSessionCount()} | Managed={managed}MB | WorkingSet={working}MB"
+                    $"[MEMORY] Managed={managed}MB | WorkingSet={working}MB"
                 );
 
                 await Task.Delay(

@@ -31,6 +31,8 @@ namespace BEx.Web.Services
             return null;
         }
 
+        public int GetSessionCount() => _sessions.Count;
+
         public bool HasSession(Guid sessionId) => _sessions.ContainsKey(sessionId);
 
         public async Task RemoveSession(Guid sessionId)
@@ -49,18 +51,6 @@ namespace BEx.Web.Services
         {
             var now = DateTime.UtcNow;
             var snapshot = _sessions.ToList();
-
-            void LogMemory(string stage) 
-            { 
-                long managed = GC.GetTotalMemory(false) / 1024 / 1024; 
-                long working = Process.GetCurrentProcess().WorkingSet64 / 1024 / 1024; 
-                
-                Console.WriteLine(
-                    $"[MEMORY] {stage} | Sessions={_sessions.Count} | Managed={managed}MB | WorkingSet={working}MB"
-                ); 
-            }
-
-            LogMemory("BEFORE CLEANUP ");
 
             int removed = 0;
 
@@ -82,14 +72,9 @@ namespace BEx.Web.Services
                 }
             }
 
-            LogMemory("AFTER REMOVAL  "); 
-            
-            // TEMPORARY DIAGNOSTIC ONLY
-            GC.Collect(); 
-            GC.WaitForPendingFinalizers(); 
-            GC.Collect(); 
-            
-            LogMemory("AFTER FORCED GC");
+            Console.WriteLine(
+                $"[MEMORY] Sessions Active: {_sessions.Count} | Sessions Removed: {removed}"
+            );
         }
 
         private static string FormatTimeAgo(DateTime lastSeen)
@@ -118,11 +103,11 @@ namespace BEx.Web.Services
             try
             {
                 var logger = services.GetRequiredService<Core.ILogger>();
-                var loader = services.GetRequiredService<IDataLoader>();
+                var dataStorageHandler = services.GetRequiredService<DataStorageHandler>();
                 var messages = services.GetRequiredService<IMessageService>();
                 var textClient = new WebTextClient();
 
-                var session = new GameSession(logger, textClient, messages, loader);
+                var session = new GameSession(logger, textClient, messages, dataStorageHandler);
 
                 bool success = session.ConnectionHandler.Connect(server, player, password);
 
