@@ -70,7 +70,7 @@ namespace BEx.Web.Services
             }
 
             Console.WriteLine(
-                $"[MEMORY] Sessions Active: {_sessions.Count} | Sessions Removed: {removed}"
+                $"[CLEANUP] Sessions Active: {_sessions.Count} | Sessions Removed: {removed}"
             );
         }
 
