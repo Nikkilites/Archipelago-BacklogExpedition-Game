@@ -56,9 +56,9 @@ else
                 Trash Shop
             </div>
 
-            @foreach (var region in @CurrentSession.RegionHandler.AvailableRegions.OrderBy(r => r.TreasureFound))
+            @foreach (var region in @CurrentSession.RegionHandler.AvailableRegions.OrderBy(r => r.LocationsLeft <= 0))
             {
-                <div class="game-item @(region.Name == SelectedSidebarItem ? "game-item-active" : "") @((region.TreasureFound && region.Locations.Count == 0) ? "game-item-finished" : "") "
+                <div class="game-item @(region.Name == SelectedSidebarItem ? "game-item-active" : "") @((region.LocationsLeft <= 0) ? "game-item-finished" : "" ) "
                 @onclick="() => SelectedSidebarItem = region.Name">
                     @region.Name Island
                 </div>
@@ -178,53 +178,54 @@ else
 
                     Region region = @CurrentSession.RegionHandler.Regions.FirstOrDefault(r => r.Name == SelectedSidebarItem);
 
-                    if (region.Locations.Count == 0)
+                    if (region.LocationsLeft <= 0)
                     {
                         <h5>This island has been fully raided!</h5>
                     }
-                    else
+                    else if (region.TreasureFound)
                     {
-                        if (region.TreasureFound)
+                        <h5>You have found the treasure on this island!</h5>
+                    }
+
+                    @foreach (var location in region.Locations)
+                    {
+                        if (!LocationChecked.ContainsKey(location))
                         {
-                            <h5>You have found the treasure on this island!</h5>
+                            LocationChecked[location] = false;
                         }
 
-                        @foreach (var location in region.Locations)
-                        {
-                            if (!LocationChecked.ContainsKey(location))
+                        <div class="location-list">
+
+                            @if (!location.IsChecked)
                             {
-                                LocationChecked[location] = false;
-                            }
-
-                            <div class="location-list">
-
                                 <input type="checkbox" @bind="LocationChecked[location]" />
 
                                 <button class="button button-small" @onclick="() => SendCheck(location)" disabled="@(!LocationChecked[location])">
                                     Send
                                 </button>
+                            }
 
-                                <div class="text">
-                                    <div class="location-with-hint">
-                                        <div class="location-name">@location.Name</div>
+                            <div class="text @(location.IsChecked ? "location-checked" : "")">
+                                <div class="location-with-hint">
+                                    <div class="location-name">@location.Name</div>
 
-                                        @{
-                                            var hint = hints.FirstOrDefault(h => h.LocationId == location.Id);
-                                        }
+                                    @{
+                                        var hint = hints.FirstOrDefault(h => h.LocationId == location.Id);
+                                    }
 
-                                        @if (hint != null)
-                                        {
-                                            <span class="location-dot"
-                                            title="@location.ScoutedInfo.ItemName for @location.ScoutedInfo.Player.Name"
-                                            style="background-color:@CurrentSession.HintHandler.GetHintColor(hint.ItemFlags)">
-                                            </span>
-                                        }
-                                    </div>
-                                    <div class="location-hint">@location.Hint</div>
+                                    @if (hint != null && !location.IsChecked)
+                                    {
+                                        <span class="location-dot"
+                                        title="@location.ScoutedInfo.ItemName for @location.ScoutedInfo.Player.Name"
+                                        style="background-color:@CurrentSession.HintHandler.GetHintColor(hint.ItemFlags)">
+                                        </span>
+                                    }
                                 </div>
-
+                                <div class="location-hint">@location.Hint</div>
                             </div>
-                        }
+
+                        </div>
+                        
                     }
                 }
             </div>

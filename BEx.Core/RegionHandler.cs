@@ -48,8 +48,13 @@ namespace BEx.Core
             }
 
             ReadOnlyCollection<long> checkedLocationIds = _gameSession.ConnectionHandler.GetLocationsChecked();
-
-            locations.RemoveAll(l => checkedLocationIds.Contains((long)l.Id));
+            foreach (var location in locations.Where(l => checkedLocationIds.Contains((long)l.Id)))
+            {
+                location.IsChecked = true;
+            }
+            locations = locations
+                .OrderBy(l => l.IsChecked)
+                .ToList();
 
             await ScoutLocations(locations);
 

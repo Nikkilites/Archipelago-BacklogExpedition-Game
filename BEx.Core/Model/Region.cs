@@ -12,7 +12,8 @@
         public string TreasureAsciiFileName { get; private set; }
         public bool RuneReceived => Name == "Starting" || _session.ItemHandler.AvailableRunes[RuneName] >= _session.RegionHandler.RunesRequired;
         public int RuneCount => _session.ItemHandler.AvailableRunes[RuneName];
-        public bool TreasureFound => 0 == Locations.Where(l => l.Entity == "monster").ToList().Count && RuneReceived;
+        public bool TreasureFound => Locations.Where(l => l.Entity == "monster" && !l.IsChecked).ToList().Count == 0 && RuneReceived;
+        public int LocationsLeft => Locations.Where(l => !l.IsChecked).Count();
 
         public Region(GameSession session, string name, string treasureName, List<Location> locations)
         {
@@ -32,7 +33,10 @@
             bool snapshot = TreasureFound;
 
             _session.ConnectionHandler.SendLocation(location.Id);
-            Locations.Remove(location);
+            location.IsChecked = true;
+            Locations = Locations
+                .OrderBy(l => l.IsChecked)
+                .ToList();
 
             if ((snapshot == false) && (TreasureFound == true))
             {

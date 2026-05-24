@@ -12,6 +12,7 @@ namespace BEx.Core.Model
         public string Entity { get; private set; }
         public string EntityName { get; private set; }
         public string AsciiFileName { get; private set; }
+        public bool IsChecked { get; set; } = false;
 
         public Location(string name, int id, string hint)
         {

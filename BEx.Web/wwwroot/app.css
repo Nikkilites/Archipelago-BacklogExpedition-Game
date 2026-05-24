@@ -198,6 +198,11 @@ h1:focus {
     flex-direction: column;
 }
 
+.location-checked {
+    opacity: 0.5; /* optional */
+    font-style: italic;
+}
+
 .location-name {
     font-weight: 600;
 }
