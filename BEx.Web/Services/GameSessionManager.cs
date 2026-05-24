@@ -117,6 +117,21 @@ namespace BEx.Web.Services
                     await RemoveSession(sessionId);
                 };
 
+                var existingSessionId = _sessions
+                    .FirstOrDefault(s =>
+                        s.Value.Session.ConnectionHandler.PlayerName == session.ConnectionHandler.PlayerName &&
+                        s.Value.Session.ConnectionHandler.ServerName == session.ConnectionHandler.ServerName)
+                    .Key;
+
+                if (existingSessionId != Guid.Empty)
+                {
+                    Console.WriteLine(
+                        $"[CLEANUP] {player} had existing active session"
+                    );
+                    
+                    RemoveSession(existingSessionId);
+                }
+
                 _sessions[sessionId] = new SessionEntry
                 {
                     Session = session,

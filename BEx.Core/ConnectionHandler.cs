@@ -22,6 +22,7 @@ namespace BEx.Core
         private ArchipelagoSession session;
         private const string gameName = "Backlog Expedition";
         public string PlayerName = "";
+        public string ServerName = "";
         public Dictionary<string, object> SlotData { get; private set; }
         public bool Connected { get; private set; }
 
@@ -70,6 +71,7 @@ namespace BEx.Core
             SlotData = loginSuccess.SlotData;
 
             PlayerName = player;
+            ServerName = server;
 
             _gameSession.Logger.Log($"[ARCHIPELAGO] Successfully connected to {server} as {player}.");
 
