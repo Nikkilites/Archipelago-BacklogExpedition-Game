@@ -376,6 +376,7 @@ else
             List<Location> allLocations = CurrentSession.RegionHandler.Regions
                 .Where(r => r.Locations.Any())
                 .SelectMany(r => r.Locations)
+                .Where(loc => !loc.IsChecked)
                 .Where(loc => !alreadyHintedLocationIds.Contains(loc.Id))
                 .ToList();
 
