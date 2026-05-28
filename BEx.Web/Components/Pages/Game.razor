@@ -52,10 +52,13 @@ else
                 Text Client
             </div>
 
-            <div class="game-item @("Shop" == SelectedSidebarItem ? "game-item-active" : "")"
-            @onclick='() => SelectedSidebarItem = "Shop"'>
-                Trash Shop
-            </div>
+            @if (@CurrentSession.HintHandler.HintCostPercentage != 0)
+            {
+                <div class="game-item @("Shop" == SelectedSidebarItem ? "game-item-active" : "")"
+                @onclick='() => SelectedSidebarItem = "Shop"'>
+                    Trash Shop
+                </div>
+            }
 
             @foreach (var region in @CurrentSession.RegionHandler.AvailableRegions.OrderBy(r => r.LocationsLeft <= 0))
             {
