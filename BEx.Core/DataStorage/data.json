@@ -22,7 +22,13 @@
     "Steampunk",
     "Moon",
     "Board Game",
-    "Puzzle"
+    "Puzzle",
+    "Canyon",
+    "Cloud",
+    "Bamboo Forest",
+    "Electronic",
+    "Musical",
+    "Jurassic"
   ],
   "monsters": [
     "Goblin",
@@ -44,7 +50,25 @@
     "Spirit",
     "Lizardman",
     "Hag",
-    "Bear"
+    "Bear",
+    "Giant Rat",
+    "Velociraptor",
+    "Manticore",
+    "Sphinx",
+    "Mummy",
+    "Vampire",
+    "Skin Walker",
+    "Crocodile",
+    "Treeant",
+    "Banshee",
+    "Zombie",
+    "Skeleton",
+    "Cyclops",
+    "Giant Mantis",
+    "Giant Spider",
+    "Robot",
+    "Bandit",
+    "Carnivorous Plant"
   ],
   "container_modifiers": [
     "Shimmering",
@@ -164,8 +188,14 @@
     "Forgotten Mask",
     "Giant Toadstool",
     "Miniature Mech",
-    "Moon Rocks",
+    "Unearthly Metal",
     "Golden Meeple",
-    "The Missing Piece"
+    "The Missing Piece",
+    "Echo in a Bottle",
+    "Key to Heaven's Gate",
+    "Panda Figurine",
+    "Circuit Board",
+    "Grand Symphony Sheets",
+    "Fossilized Amber"
   ]
 }
