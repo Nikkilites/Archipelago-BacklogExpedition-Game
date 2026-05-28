@@ -34,6 +34,26 @@ else
 
     <div class="app-layout">
 
+        @if (Popups.Any())
+        {
+            <div class="popup-overlay">
+
+                <div class="popup-container">
+
+                    <h5>@Popups[0].Message</h5>
+
+                    <img src="@Popups[0].ImgPath"
+                    class="popup-image" />
+
+                    <button class="button button-small" @onclick="() => ClosePopup(Popups[0])">
+                        Close
+                    </button>
+
+                </div>
+
+            </div>
+        }
+
         <div class="notification-container">
             @foreach (var note in Notifications)
             {
@@ -257,6 +277,12 @@ else
         public string DotColor { get; set; } = "#00EEEE"; // default cyan
     }
 
+    public class PopUp
+    {
+        public string Message { get; set; } = "";
+        public string ImgPath { get; set; } = "";
+    }
+
     private SessionEntry? CurrentSessionEntry;
     private GameSession? CurrentSession;
 
@@ -337,6 +363,7 @@ else
     }
 
     List<Notification> Notifications = new();
+    List<PopUp> Popups = new();
 
     void SendCheck(Location location)
     {
@@ -345,11 +372,26 @@ else
         var region = CurrentSession.RegionHandler.Regions.FirstOrDefault(r => r.Name == SelectedSidebarItem);
         if (region != null)
         {
+            bool snapshot = region.TreasureFound;
+
+            // Send location
             Logger.Log($"{PlayerName} sent location: {location.Name}");
             region.CheckLocation(location);
 
+            // Add treasure pop up if treasure was found
+            if ((!snapshot) && (region.TreasureFound))
+            {
+                Popups.Add(new PopUp
+                    {
+                        Message = $"You have found the treasure of the {location.Name}!",
+                        ImgPath = "https://png.pngtree.com/png-vector/20241205/ourmid/pngtree-wooden-treasure-chest-clipart-gold-coins-jewels-and-gems-png-image_14650773.png"
+                    }
+                );
+            }
+
             StateHasChanged();
 
+            // Create and display notification
             string dotColor = CurrentSession.HintHandler.GetHintColor(location.ScoutedInfo.Flags);
 
             var notification = new Notification
@@ -367,8 +409,26 @@ else
 
             _ = CreateNotification(notification);
 
-            CurrentSession.GoalHandler.CheckIfGoal();
+            bool goaled = CurrentSession.GoalHandler.CheckIfGoal();
+
+            // Add goaled pop up if goaled
+            if (goaled)
+            {
+                Popups.Add(new PopUp
+                    {
+                        Message = $"You have finished your raid!",
+                        ImgPath = "https://png.pngtree.com/png-vector/20241205/ourmid/pngtree-wooden-treasure-chest-clipart-gold-coins-jewels-and-gems-png-image_14650773.png"
+                    }
+                );
+                StateHasChanged();
+            }
         }
+    }
+
+    void ClosePopup(PopUp item)
+    {
+        Popups.Remove(item);
+        StateHasChanged();
     }
 
     void SendHint()
