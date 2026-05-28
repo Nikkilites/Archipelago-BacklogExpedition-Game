@@ -16,7 +16,11 @@
     </div>
 
     <div class="loading">Waiting for Server...</div>
-    <div class="loading">Please reload if this takes more than 10 seconds.</div>
+
+    if (_hasBeenConnected)
+    {
+        @Logout()
+    }
 }
 else
 {
@@ -256,6 +260,8 @@ else
     private SessionEntry? CurrentSessionEntry;
     private GameSession? CurrentSession;
 
+    private bool _hasBeenConnected = false;
+
     private List<Hint> hints = new();
     private bool _isRetrievingHints = false;
 
@@ -294,6 +300,8 @@ else
                 _textClient.OnMessageAdded += HandleNewMessage;
                 _subscribedTextClient = true;
             }
+
+            _hasBeenConnected = true;
         }
         else
         {
@@ -501,6 +509,8 @@ else
                 await SessionManager.RemoveSession(sessionId);
             }
         }
+
+        _hasBeenConnected = false;
 
         try
         {
