@@ -10,6 +10,8 @@ namespace BEx.Core
         public List<Hint> AllHints { get; private set; } = new();
         public event Action? OnHintsUpdated;
 
+        public double HintCostPercentage { get; set; } = 20;
+
         private DateTime _lastFetch = DateTime.MinValue;
         private readonly TimeSpan _cacheDuration = TimeSpan.FromSeconds(10);
 
@@ -65,7 +67,7 @@ namespace BEx.Core
 
         public int GetHintCost()
         {
-            int hintCost = (int)Math.Round(_gameSession.ItemHandler.TrashInWorld / 20.0, MidpointRounding.AwayFromZero);
+            int hintCost = (int)Math.Round(_gameSession.ItemHandler.TrashInWorld * (HintCostPercentage/100), MidpointRounding.AwayFromZero);
             if (hintCost <= 1)
                 hintCost = 1;
 

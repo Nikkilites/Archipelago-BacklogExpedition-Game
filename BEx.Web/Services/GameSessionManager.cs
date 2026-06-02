@@ -158,6 +158,17 @@ namespace BEx.Web.Services
                     session.RegionHandler.RunesRequired = 1;
                 }
 
+                if (slotData.TryGetValue("hint_shop_cost", out var hintCost))
+                {
+                    session.HintHandler.HintCostPercentage = Convert.ToDouble(hintCost);
+                }
+                else
+                {
+                    session.HintHandler.HintCostPercentage = 20;
+                }
+
+
+
                 session.RegionHandler.CreateRegions(slotData);
 
                 session.ItemHandler.SetupItemHandler();

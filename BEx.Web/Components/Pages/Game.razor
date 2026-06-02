@@ -16,7 +16,11 @@
     </div>
 
     <div class="loading">Waiting for Server...</div>
-    <div class="loading">Please reload if this takes more than 10 seconds.</div>
+
+    if (_hasBeenConnected)
+    {
+        @Logout()
+    }
 }
 else
 {
@@ -29,6 +33,26 @@ else
     </div>
 
     <div class="app-layout">
+
+        @if (Popups.Any())
+        {
+            <div class="popup-overlay">
+
+                <div class="popup-container">
+
+                    <h5>@Popups[0].Message</h5>
+
+@*                     <img src="@Popups[0].ImgPath"
+                    class="popup-image" /> *@
+
+                    <button class="button button-small" @onclick="() => ClosePopup(Popups[0])">
+                        Close
+                    </button>
+
+                </div>
+
+            </div>
+        }
 
         <div class="notification-container">
             @foreach (var note in Notifications)
@@ -52,10 +76,13 @@ else
                 Text Client
             </div>
 
-            <div class="game-item @("Shop" == SelectedSidebarItem ? "game-item-active" : "")"
-            @onclick='() => SelectedSidebarItem = "Shop"'>
-                Trash Shop
-            </div>
+            @if (@CurrentSession.HintHandler.HintCostPercentage != 0)
+            {
+                <div class="game-item @("Shop" == SelectedSidebarItem ? "game-item-active" : "")"
+                @onclick='() => SelectedSidebarItem = "Shop"'>
+                    Trash Shop
+                </div>
+            }
 
             @foreach (var region in @CurrentSession.RegionHandler.AvailableRegions.OrderBy(r => r.LocationsLeft <= 0))
             {
@@ -250,8 +277,16 @@ else
         public string DotColor { get; set; } = "#00EEEE"; // default cyan
     }
 
+    public class PopUp
+    {
+        public string Message { get; set; } = "";
+        public string ImgPath { get; set; } = "";
+    }
+
     private SessionEntry? CurrentSessionEntry;
     private GameSession? CurrentSession;
+
+    private bool _hasBeenConnected = false;
 
     private List<Hint> hints = new();
     private bool _isRetrievingHints = false;
@@ -291,6 +326,8 @@ else
                 _textClient.OnMessageAdded += HandleNewMessage;
                 _subscribedTextClient = true;
             }
+
+            _hasBeenConnected = true;
         }
         else
         {
@@ -326,6 +363,7 @@ else
     }
 
     List<Notification> Notifications = new();
+    List<PopUp> Popups = new();
 
     void SendCheck(Location location)
     {
@@ -334,11 +372,26 @@ else
         var region = CurrentSession.RegionHandler.Regions.FirstOrDefault(r => r.Name == SelectedSidebarItem);
         if (region != null)
         {
+            bool snapshot = region.TreasureFound;
+
+            // Send location
             Logger.Log($"{PlayerName} sent location: {location.Name}");
             region.CheckLocation(location);
 
+            // Add treasure pop up if treasure was found
+            if ((!snapshot) && (region.TreasureFound))
+            {
+                Popups.Add(new PopUp
+                    {
+                        Message = $"Congratulations! You have found the {region.TreasureName}!",
+                        ImgPath = ""
+                    }
+                );
+            }
+
             StateHasChanged();
 
+            // Create and display notification
             string dotColor = CurrentSession.HintHandler.GetHintColor(location.ScoutedInfo.Flags);
 
             var notification = new Notification
@@ -356,8 +409,26 @@ else
 
             _ = CreateNotification(notification);
 
-            CurrentSession.GoalHandler.CheckIfGoal();
+            bool goaled = CurrentSession.GoalHandler.CheckIfGoal();
+
+            // Add goaled pop up if goaled
+            if (goaled)
+            {
+                Popups.Add(new PopUp
+                    {
+                        Message = $"Congratulations! You have completed your goal!",
+                        ImgPath = ""
+                    }
+                );
+                StateHasChanged();
+            }
         }
+    }
+
+    void ClosePopup(PopUp item)
+    {
+        Popups.Remove(item);
+        StateHasChanged();
     }
 
     void SendHint()
@@ -498,6 +569,8 @@ else
                 await SessionManager.RemoveSession(sessionId);
             }
         }
+
+        _hasBeenConnected = false;
 
         try
         {
