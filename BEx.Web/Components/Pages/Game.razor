@@ -42,8 +42,8 @@ else
 
                     <h5>@Popups[0].Message</h5>
 
-                    <img src="@Popups[0].ImgPath"
-                    class="popup-image" />
+@*                     <img src="@Popups[0].ImgPath"
+                    class="popup-image" /> *@
 
                     <button class="button button-small" @onclick="() => ClosePopup(Popups[0])">
                         Close
@@ -383,8 +383,8 @@ else
             {
                 Popups.Add(new PopUp
                     {
-                        Message = $"You have found the treasure of the {location.Name}!",
-                        ImgPath = "https://png.pngtree.com/png-vector/20241205/ourmid/pngtree-wooden-treasure-chest-clipart-gold-coins-jewels-and-gems-png-image_14650773.png"
+                        Message = $"Congratulations! You have found the {region.TreasureName}!",
+                        ImgPath = ""
                     }
                 );
             }
@@ -416,8 +416,8 @@ else
             {
                 Popups.Add(new PopUp
                     {
-                        Message = $"You have finished your raid!",
-                        ImgPath = "https://png.pngtree.com/png-vector/20241205/ourmid/pngtree-wooden-treasure-chest-clipart-gold-coins-jewels-and-gems-png-image_14650773.png"
+                        Message = $"Congratulations! You have completed your goal!",
+                        ImgPath = ""
                     }
                 );
                 StateHasChanged();
