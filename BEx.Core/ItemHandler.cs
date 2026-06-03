@@ -28,7 +28,7 @@ namespace BEx.Core
         }
 
         public int TrashAvailable => _trashAcquired - trashUsed;
-        public int TrashInWorld => _gameSession.ConnectionHandler.AllLocationsCount - ((_gameSession.RegionHandler.Regions.Count -1) * _gameSession.RegionHandler.RunesRequired); 
+        public int TrashInWorld => _gameSession.ConnectionHandler.AllLocationsCount - ((_gameSession.RegionHandler.RegionsInWorld.Count -1) * _gameSession.RegionHandler.RunesRequired); 
 
         private string trashServerDataStorageKey = "";
 
