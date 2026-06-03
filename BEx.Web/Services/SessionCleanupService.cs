@@ -13,8 +13,8 @@
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                _manager.CleanupExpiredSessions();
-                await Task.Delay(TimeSpan.FromHours(1), stoppingToken);
+                await _manager.CleanupExpiredSessions();
+                await Task.Delay(TimeSpan.FromMinutes(30), stoppingToken);
             }
         }
     }

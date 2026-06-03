@@ -5,10 +5,9 @@ using System.Text.Json;
 
 namespace BEx.Core
 {
-    public class RegionHandler(GameSession gameSession, ILogger logger)
+    public class RegionHandler(GameSession gameSession)
     {
         private readonly GameSession _gameSession = gameSession;
-        private readonly ILogger _logger = logger;
 
         public List<Region> Regions { get; set; } = [];
         public List<Region> AvailableRegions => Regions.Where(r => r.RuneReceived).ToList();
@@ -24,10 +23,7 @@ namespace BEx.Core
 
             List<Region> regions = [];
 
-            List<string> regionNames = _gameSession.DataStorageHandler.Regions;
-            List<string> treasureNames = _gameSession.DataStorageHandler.Treasures;
-
-            foreach (var (regionName, treasureName) in regionNames.Zip(treasureNames))
+            foreach (var (regionName, treasureName) in _gameSession.DataStorageHandler.Regions.Zip(_gameSession.DataStorageHandler.Treasures))
             {
                 List<Location> regionLocations = [.. locations.Where(l => l.Region == regionName)];
 
@@ -39,7 +35,7 @@ namespace BEx.Core
 
         private async Task<List<Location>> CreateLocations(Dictionary<string, object> slotData)
         {
-            _logger.Log($"Will Process Hint Location Data for {_gameSession.ConnectionHandler.PlayerName}");
+            _gameSession.Logger.Log($"{_gameSession.ConnectionHandler.PlayerName}'s Hint Location Data will be processed");
 
             Dictionary<int, string> HintData = JsonSerializer.Deserialize<Dictionary<int, string>>(slotData["hint_data"].ToString());
 
@@ -52,8 +48,13 @@ namespace BEx.Core
             }
 
             ReadOnlyCollection<long> checkedLocationIds = _gameSession.ConnectionHandler.GetLocationsChecked();
-
-            locations.RemoveAll(l => checkedLocationIds.Contains((long)l.Id));
+            foreach (var location in locations.Where(l => checkedLocationIds.Contains((long)l.Id)))
+            {
+                location.IsChecked = true;
+            }
+            locations = locations
+                .OrderBy(l => l.IsChecked)
+                .ToList();
 
             await ScoutLocations(locations);
 

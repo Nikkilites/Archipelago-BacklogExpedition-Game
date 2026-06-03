@@ -9,16 +9,18 @@
         public GoalHandler GoalHandler { get; }
         public HintHandler HintHandler { get; }
         public ITextClient TextClient { get; }
+        public ILogger Logger { get; }
 
 
-        public GameSession(ILogger logger, ITextClient textClient, IMessageService messages, IDataLoader loader)
+        public GameSession(ILogger logger, ITextClient textClient, DataStorageHandler dataStorageHandler)
         {
-            ConnectionHandler = new ConnectionHandler(this, logger, textClient);
-            DataStorageHandler = new DataStorageHandler(logger, loader);
-            ItemHandler = new ItemHandler(this, logger);
-            RegionHandler = new RegionHandler(this, logger);
-            GoalHandler = new GoalHandler(this, logger);
-            HintHandler = new HintHandler(this, logger);
+            Logger = logger;
+            DataStorageHandler = dataStorageHandler;
+            ConnectionHandler = new ConnectionHandler(this, textClient);
+            ItemHandler = new ItemHandler(this);
+            RegionHandler = new RegionHandler(this);
+            GoalHandler = new GoalHandler(this);
+            HintHandler = new HintHandler(this);
             TextClient = textClient;
         }
     }

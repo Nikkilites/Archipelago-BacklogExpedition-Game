@@ -11,19 +11,48 @@
 
 @if (CurrentSession == null || !CurrentSession.ConnectionHandler.Connected)
 {
+    <div class="connected-row px-4">
+        <div class="title-text">Backlog Expedition</div>
+    </div>
+
     <div class="loading">Waiting for Server...</div>
+
+    if (_hasBeenConnected)
+    {
+        @Logout()
+    }
 }
 else
 {
     <div class="connected-row px-4">
         <div class="title-text">Backlog Expedition</div>
-        <div class="text">Welcome @CurrentSession.ConnectionHandler.PlayerName, you have been connected to Archipelago!</div>
+        <div class="text">Welcome @PlayerName, you have been connected to Archipelago!</div>
         <button class="logout-button button button-small" @onclick="Logout">
             Logout
         </button>
     </div>
 
     <div class="app-layout">
+
+        @if (Popups.Any())
+        {
+            <div class="popup-overlay">
+
+                <div class="popup-container">
+
+                    <h5>@Popups[0].Message</h5>
+
+@*                     <img src="@Popups[0].ImgPath"
+                    class="popup-image" /> *@
+
+                    <button class="button button-small" @onclick="() => ClosePopup(Popups[0])">
+                        Close
+                    </button>
+
+                </div>
+
+            </div>
+        }
 
         <div class="notification-container">
             @foreach (var note in Notifications)
@@ -47,14 +76,17 @@ else
                 Text Client
             </div>
 
-            <div class="game-item @("Shop" == SelectedSidebarItem ? "game-item-active" : "")"
-            @onclick='() => SelectedSidebarItem = "Shop"'>
-                Trash Shop
-            </div>
-
-            @foreach (var region in @CurrentSession.RegionHandler.AvailableRegions.OrderBy(r => r.TreasureFound))
+            @if (@CurrentSession.HintHandler.HintCostPercentage != 0)
             {
-                <div class="game-item @(region.Name == SelectedSidebarItem ? "game-item-active" : "") @((region.TreasureFound && region.Locations.Count == 0) ? "game-item-finished" : "") "
+                <div class="game-item @("Shop" == SelectedSidebarItem ? "game-item-active" : "")"
+                @onclick='() => SelectedSidebarItem = "Shop"'>
+                    Trash Shop
+                </div>
+            }
+
+            @foreach (var region in @CurrentSession.RegionHandler.AvailableRegions.OrderBy(r => r.LocationsLeft <= 0))
+            {
+                <div class="game-item @(region.Name == SelectedSidebarItem ? "game-item-active" : "") @((region.LocationsLeft <= 0) ? "game-item-finished" : "" ) "
                 @onclick="() => SelectedSidebarItem = region.Name">
                     @region.Name Island
                 </div>
@@ -174,55 +206,54 @@ else
 
                     Region region = @CurrentSession.RegionHandler.Regions.FirstOrDefault(r => r.Name == SelectedSidebarItem);
 
-                    if (region.Locations.Count == 0)
+                    if (region.LocationsLeft <= 0)
                     {
                         <h5>This island has been fully raided!</h5>
                     }
-                    else
+                    else if (region.TreasureFound)
                     {
-                        if (region.TreasureFound)
+                        <h5>You have found the treasure on this island!</h5>
+                    }
+
+                    @foreach (var location in region.Locations)
+                    {
+                        if (!LocationChecked.ContainsKey(location))
                         {
-                            <h5>You have found the treasure on this island!</h5>
+                            LocationChecked[location] = false;
                         }
 
-                        List<Hint> hints = @CurrentSession.HintHandler.AllHints.Where(h => h.FindingPlayer == CurrentSession.ConnectionHandler.GetThisSlotId()).ToList();
+                        <div class="location-list">
 
-                        @foreach (var location in region.Locations)
-                        {
-                            if (!LocationChecked.ContainsKey(location))
+                            @if (!location.IsChecked)
                             {
-                                LocationChecked[location] = false;
-                            }
-
-                            <div class="location-list">
-
                                 <input type="checkbox" @bind="LocationChecked[location]" />
 
                                 <button class="button button-small" @onclick="() => SendCheck(location)" disabled="@(!LocationChecked[location])">
                                     Send
                                 </button>
+                            }
 
-                                <div class="text">
-                                    <div class="location-with-hint">
-                                        <div class="location-name">@location.Name</div>
+                            <div class="text @(location.IsChecked ? "location-checked" : "")">
+                                <div class="location-with-hint">
+                                    <div class="location-name">@location.Name</div>
 
-                                        @{
-                                            var hint = hints.FirstOrDefault(h => h.LocationId == location.Id);
-                                        }
+                                    @{
+                                        var hint = hints.FirstOrDefault(h => h.LocationId == location.Id);
+                                    }
 
-                                        @if (hint != null)
-                                        {
-                                            <span class="location-dot"
-                                            title="@location.ScoutedInfo.ItemName for @location.ScoutedInfo.Player.Name"
-                                            style="background-color:@CurrentSession.HintHandler.GetHintColor(hint.ItemFlags)">
-                                            </span>
-                                        }
-                                    </div>
-                                    <div class="location-hint">@location.Hint</div>
+                                    @if (hint != null && !location.IsChecked)
+                                    {
+                                        <span class="location-dot"
+                                        title="@location.ScoutedInfo.ItemName for @location.ScoutedInfo.Player.Name"
+                                        style="background-color:@CurrentSession.HintHandler.GetHintColor(hint.ItemFlags)">
+                                        </span>
+                                    }
                                 </div>
-
+                                <div class="location-hint">@location.Hint</div>
                             </div>
-                        }
+
+                        </div>
+                        
                     }
                 }
             </div>
@@ -246,8 +277,19 @@ else
         public string DotColor { get; set; } = "#00EEEE"; // default cyan
     }
 
+    public class PopUp
+    {
+        public string Message { get; set; } = "";
+        public string ImgPath { get; set; } = "";
+    }
+
     private SessionEntry? CurrentSessionEntry;
     private GameSession? CurrentSession;
+
+    private bool _hasBeenConnected = false;
+
+    private List<Hint> hints = new();
+    private bool _isRetrievingHints = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -261,6 +303,7 @@ else
                 Guid sessionId = result.Value;
                 CurrentSessionEntry = SessionManager.GetSessionEntry(sessionId);
                 CurrentSession = CurrentSessionEntry?.Session;
+                PlayerName = CurrentSession?.ConnectionHandler.PlayerName;
             }
         }
         catch (CryptographicException)
@@ -268,8 +311,11 @@ else
             await ProtectedSessionStore.DeleteAsync("CurrentPlayer");
         }
 
-        if (CurrentSessionEntry != null && CurrentSession.ConnectionHandler.Connected)
+        if (CurrentSessionEntry != null && CurrentSession != null && CurrentSession.ConnectionHandler.Connected)
         {
+            CurrentSession.HintHandler.OnHintsUpdated += HandleHintsUpdated;
+            hints = await CurrentSession.HintHandler.GetAllHintsAsync();
+
             foreach (var region in CurrentSession.RegionHandler.AvailableRegions)
                 foreach (var location in region.Locations)
                     LocationChecked[location] = false;
@@ -280,11 +326,14 @@ else
                 _textClient.OnMessageAdded += HandleNewMessage;
                 _subscribedTextClient = true;
             }
+
+            _hasBeenConnected = true;
         }
         else
         {
             await ReloadIfSessionMissingAsync();
         }
+
         StateHasChanged();
     }
 
@@ -302,6 +351,11 @@ else
 
     public void Dispose()
     {
+        if (CurrentSession != null)
+        {
+            CurrentSession.HintHandler.OnHintsUpdated -= HandleHintsUpdated;
+        }
+
         if (_subscribedTextClient && _textClient != null)
         {
             _textClient.OnMessageAdded -= HandleNewMessage;
@@ -309,17 +363,35 @@ else
     }
 
     List<Notification> Notifications = new();
+    List<PopUp> Popups = new();
 
     void SendCheck(Location location)
     {
+        CurrentSessionEntry?.SetSessionActivity();
+
         var region = CurrentSession.RegionHandler.Regions.FirstOrDefault(r => r.Name == SelectedSidebarItem);
         if (region != null)
         {
-            Logger.Log($"Send Location: {location.Name}");
+            bool snapshot = region.TreasureFound;
+
+            // Send location
+            Logger.Log($"{PlayerName} sent location: {location.Name}");
             region.CheckLocation(location);
+
+            // Add treasure pop up if treasure was found
+            if ((!snapshot) && (region.TreasureFound))
+            {
+                Popups.Add(new PopUp
+                    {
+                        Message = $"Congratulations! You have found the {region.TreasureName}!",
+                        ImgPath = ""
+                    }
+                );
+            }
 
             StateHasChanged();
 
+            // Create and display notification
             string dotColor = CurrentSession.HintHandler.GetHintColor(location.ScoutedInfo.Flags);
 
             var notification = new Notification
@@ -328,20 +400,45 @@ else
                 DotColor = dotColor
             };
 
-            CurrentSessionEntry?.RecentLocationsSent.Add(notification);
+            var recentLocations = CurrentSessionEntry?.RecentLocationsSent;
+            recentLocations.Add(notification);
+            if (recentLocations.Count > 5)
+            {
+                recentLocations.RemoveAt(0);
+            }
 
             _ = CreateNotification(notification);
 
-            CurrentSession.GoalHandler.CheckIfGoal();
+            bool goaled = CurrentSession.GoalHandler.CheckIfGoal();
+
+            // Add goaled pop up if goaled
+            if (goaled)
+            {
+                Popups.Add(new PopUp
+                    {
+                        Message = $"Congratulations! You have completed your goal!",
+                        ImgPath = ""
+                    }
+                );
+                StateHasChanged();
+            }
         }
+    }
+
+    void ClosePopup(PopUp item)
+    {
+        Popups.Remove(item);
+        StateHasChanged();
     }
 
     void SendHint()
     {
+        CurrentSessionEntry?.SetSessionActivity();
+
         int hintCost = CurrentSession.HintHandler.GetHintCost();
         if (CurrentSession.ItemHandler.TrashAvailable >= hintCost)
         {
-            List<long> alreadyHintedLocationIds = CurrentSession.HintHandler.AllHints
+            List<long> alreadyHintedLocationIds = hints
                 .Where(h => h.FindingPlayer == CurrentSession.ConnectionHandler.GetThisSlotId())
                 .Where(h => h.Status == HintStatus.Unspecified)
                 .Select(h => h.LocationId)
@@ -350,6 +447,7 @@ else
             List<Location> allLocations = CurrentSession.RegionHandler.Regions
                 .Where(r => r.Locations.Any())
                 .SelectMany(r => r.Locations)
+                .Where(loc => !loc.IsChecked)
                 .Where(loc => !alreadyHintedLocationIds.Contains(loc.Id))
                 .ToList();
 
@@ -368,7 +466,7 @@ else
                     };
 
                 _ = CreateNotification(notification);
-                Logger.Log($"{CurrentSession.ConnectionHandler.PlayerName} puchased a Hint");
+                Logger.Log($"{PlayerName} puchased a Hint");
             }
             else
             {
@@ -379,7 +477,7 @@ else
                     };
 
                 _ = CreateNotification(notification);
-                Logger.Log($"Hint could not be purchased");
+                Logger.Log($"{PlayerName} could not purchase Hint");
             }
         }
         else
@@ -391,8 +489,15 @@ else
                 };
 
             _ = CreateNotification(notification);
-            Logger.Log($"Hint could not be purchased");
+            Logger.Log($"{PlayerName} could not purchase Hint");
         }
+    }
+
+    private void HandleHintsUpdated()
+    {
+        hints = CurrentSession?.HintHandler.AllHints ?? new List<Hint>();
+        Logger.Log($"{PlayerName}'s Server Hints were updated");
+        InvokeAsync(StateHasChanged);
     }
 
     string CurrentInput = "";
@@ -414,6 +519,8 @@ else
 
     async Task SendTextMessage()
     {
+        CurrentSessionEntry?.SetSessionActivity();
+
         if (!string.IsNullOrWhiteSpace(CurrentInput))
         {
             _textClient.SendMessageToServer(CurrentSession, CurrentInput);
@@ -449,7 +556,7 @@ else
     {
         if (CurrentSession != null)
         {
-            Logger.Log($"{CurrentSession.ConnectionHandler.PlayerName} logged out");
+            Logger.Log($"{PlayerName} logged out");
 
             await CurrentSession.ConnectionHandler.Disconnect();
 
@@ -459,10 +566,22 @@ else
                 Guid sessionId = result.Value;
 
                 await ProtectedSessionStore.DeleteAsync("CurrentPlayer");
-                SessionManager.RemoveSession(sessionId);
+                await SessionManager.RemoveSession(sessionId);
             }
         }
 
-        Nav.NavigateTo("/", true);
+        _hasBeenConnected = false;
+
+        try
+        {
+            await InvokeAsync(() =>
+            {
+                Nav.NavigateTo("/", true);
+            });
+        }
+        catch (TaskCanceledException)
+        {
+            // expected if circuit is already gone
+        }
     }
 }

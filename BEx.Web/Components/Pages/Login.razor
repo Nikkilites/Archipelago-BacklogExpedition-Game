@@ -10,33 +10,55 @@
     <div class="title-text">Backlog Expedition</div>
 </div>
 
-<div class="login-container">
-    <h2>Archipelago Login</h2>
+@if (!_isLoaded)
+{
+    <div class="loading">Waiting for Server...</div>
+}
+else
+{
+    <div class="login-page">
+        <div class="login-container">
+            <h2>Archipelago Login</h2>
 
-    <div class="form-group">
-        <label>Host and Port</label>
-        <input @bind="HostPort" class="form-control" placeholder="Example: archipelago.gg:12345" />
+            <div class="form-group">
+                <label>Host and Port</label>
+                <input @bind="HostPort" class="form-control" placeholder="Example: archipelago.gg:12345" />
+            </div>
+
+            <div class="form-group">
+                <label>Player Name</label>
+                <input @bind="PlayerName" class="form-control" placeholder="Example: MyBExName" />
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <input @bind="Password" type="password" class="form-control" placeholder="Leave blank if no password" />
+            </div>
+
+            <button class="button @(_isConnecting ? "connecting" : "")"
+                    @onclick="LoginAndConnect"
+                    disabled="@_isConnecting">
+                @(_isConnecting ? "Connecting..." : "Login & Connect")
+            </button>
+        </div>
+
+        @if (_failedLogin)
+        {
+            <div class="login-error">
+                Connection failed. Please refresh the room, check your login info and the room data, then try again.
+            </div>
+        }
     </div>
-
-    <div class="form-group">
-        <label>Player Name</label>
-        <input @bind="PlayerName" class="form-control" placeholder="Example: MyBExName" />
-    </div>
-
-    <div class="form-group">
-        <label>Password</label>
-        <input @bind="Password" type="password" class="form-control" placeholder="Leave blank if no password" />
-    </div>
-
-    <button class="button" @onclick="LoginAndConnect">
-        Login & Connect
-    </button>
-</div>
+}
 
 @code {
     string? HostPort = "";
     string? PlayerName = "";
     string? Password = "";
+
+    private bool _isLoaded = false;
+    private bool _isConnecting = false;
+    private bool _failedLogin = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -66,33 +88,80 @@
         {
             await ProtectedSessionStore.DeleteAsync("CurrentPlayer");
         }
+
+        HostPort = await GetLastSessionPort();
+        PlayerName = await GetLastSessionPlayer();
+        _isLoaded = true;
+        StateHasChanged();
+    }
+
+    private async Task<string> GetLastSessionPlayer()
+    {
+        try
+        {
+            var result = await ProtectedLocalStore.GetAsync<String>("LastPlayer");
+            return result.Success ? result.Value : string.Empty;
+        }
+        catch (CryptographicException)
+        {
+            await ProtectedLocalStore.DeleteAsync("LastPlayer");
+            return string.Empty;
+        }
+    }
+
+    private async Task<string> GetLastSessionPort()
+    {
+        try
+        {
+            var result = await ProtectedLocalStore.GetAsync<String>("LastHost");
+            return result.Success ? result.Value : string.Empty;
+        }
+        catch (CryptographicException)
+        {
+            await ProtectedLocalStore.DeleteAsync("LastHost");
+            return string.Empty;
+        }
     }
 
     private async Task LoginAndConnect()
     {
-        Guid sessionId = Guid.NewGuid();
+        _isConnecting = true;
+        await InvokeAsync(StateHasChanged);
 
-        GameSession session = SessionManager.CreateSession(
-            HostPort!,
-            PlayerName!,
-            Password ?? "",
-            Services,
-            sessionId);
-
-        if (session != null)
+        try
         {
-            await ProtectedSessionStore.SetAsync("CurrentPlayer", sessionId);
+            Guid sessionId = Guid.NewGuid();
 
-            session.GoalHandler.GoalReached += () =>
+            await ProtectedLocalStore.SetAsync("LastHost", HostPort);
+            await ProtectedLocalStore.SetAsync("LastPlayer", PlayerName);
+
+            GameSession session = SessionManager.CreateSession(
+                HostPort!,
+                PlayerName!,
+                Password ?? "",
+                Services,
+                sessionId);
+
+            if (session != null)
             {
-                Nav.NavigateTo($"/connected");
-            };
+                await ProtectedSessionStore.SetAsync("CurrentPlayer", sessionId);
 
-            Nav.NavigateTo($"/connected");
+                session.GoalHandler.GoalReached += () =>
+                {
+                    Nav.NavigateTo($"/connected");
+                };
+
+                Nav.NavigateTo($"/connected");
+            }
+            else
+            {
+                _failedLogin = true;
+            }
         }
-        else
+        finally
         {
-            Nav.NavigateTo("/");
+            _isConnecting = false;
+            await InvokeAsync(StateHasChanged);
         }
     }
 }

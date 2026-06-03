@@ -1,5 +1,6 @@
 ﻿using BEx.Core;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using static BEx.Web.Components.Pages.Game;
 
 namespace BEx.Web.Services
@@ -12,7 +13,7 @@ namespace BEx.Web.Services
         {
             if (_sessions.TryGetValue(sessionId, out var entry))
             {
-                entry.LastSeen = DateTime.UtcNow;
+                entry.SetSessionActivity();
                 return entry.Session;
             }
 
@@ -23,34 +24,70 @@ namespace BEx.Web.Services
         {
             if (_sessions.TryGetValue(sessionId, out var entry))
             {
-                entry.LastSeen = DateTime.UtcNow;
+                entry.SetSessionActivity();
                 return entry;
             }
 
             return null;
         }
-
         public bool HasSession(Guid sessionId) => _sessions.ContainsKey(sessionId);
 
         public async Task RemoveSession(Guid sessionId)
         {
             if (_sessions.TryRemove(sessionId, out var entry))
             {
+                Console.WriteLine(
+                    $"[CLEANUP]        {entry.Session.ConnectionHandler.PlayerName} was removed"
+                );
+
                 await entry.Session.ConnectionHandler.Disconnect();
             }
         }
 
-        public void CleanupExpiredSessions()
+        public async Task CleanupExpiredSessions()
         {
             var now = DateTime.UtcNow;
+            var snapshot = _sessions.ToList();
 
-            foreach (var pair in _sessions)
+            int removed = 0;
+
+            foreach (var pair in snapshot)
             {
-                if (now - pair.Value.LastSeen > TimeSpan.FromMinutes(5))
+                var player = pair.Value.Session.ConnectionHandler.PlayerName;
+
+                Console.WriteLine(
+                    $"[CLEANUP] {player} was last seen {FormatTimeAgo(pair.Value.LastSeen)}"
+                );
+
+                if (now - pair.Value.LastSeen > TimeSpan.FromHours(2))
                 {
-                    RemoveSession(pair.Key);
+                    Console.WriteLine(
+                        $"[CLEANUP]        Removing inactive session: {player}"
+                    );
+                    await RemoveSession(pair.Key);
+                    removed++;
                 }
             }
+
+            Console.WriteLine(
+                $"[CLEANUP] Sessions Active: {_sessions.Count} | Sessions Removed: {removed}"
+            );
+        }
+
+        private static string FormatTimeAgo(DateTime lastSeen)
+        {
+            var diff = DateTime.UtcNow - lastSeen;
+
+            if (diff.TotalSeconds < 60)
+                return $"{(int)diff.TotalSeconds}s ago";
+
+            if (diff.TotalMinutes < 60)
+                return $"{(int)diff.TotalMinutes}m ago";
+
+            if (diff.TotalHours < 24)
+                return $"{(int)diff.TotalHours}h ago";
+
+            return $"{(int)diff.TotalDays}d ago";
         }
 
         public GameSession? CreateSession(
@@ -63,17 +100,36 @@ namespace BEx.Web.Services
             try
             {
                 var logger = services.GetRequiredService<Core.ILogger>();
-                var loader = services.GetRequiredService<IDataLoader>();
-                var messages = services.GetRequiredService<IMessageService>();
+                var dataStorageHandler = services.GetRequiredService<DataStorageHandler>();
                 var textClient = new WebTextClient();
 
-                var session = new GameSession(logger, textClient, messages, loader);
+                var session = new GameSession(logger, textClient, dataStorageHandler);
 
                 bool success = session.ConnectionHandler.Connect(server, player, password);
 
                 if (!success)
                 {
                     return null;
+                }
+
+                session.ConnectionHandler.Disconnected += async () =>
+                {
+                    await RemoveSession(sessionId);
+                };
+
+                var existingSessionId = _sessions
+                    .FirstOrDefault(s =>
+                        s.Value.Session.ConnectionHandler.PlayerName == session.ConnectionHandler.PlayerName &&
+                        s.Value.Session.ConnectionHandler.ServerName == session.ConnectionHandler.ServerName)
+                    .Key;
+
+                if (existingSessionId != Guid.Empty)
+                {
+                    Console.WriteLine(
+                        $"[CLEANUP] {player} had existing active session"
+                    );
+                    
+                    RemoveSession(existingSessionId);
                 }
 
                 _sessions[sessionId] = new SessionEntry
@@ -83,16 +139,35 @@ namespace BEx.Web.Services
                 };
 
                 Dictionary<string, object> slotData = session.ConnectionHandler.SlotData;
-                session.GoalHandler.TreasuresToGoal = Convert.ToInt32(slotData["beaten_to_goal"]);
-                //_session.RegionHandler.RunesRequired = Convert.ToInt32(slotData["runes_required"]);
-                if (slotData.TryGetValue("runes_required", out var value))
+
+                if (slotData.TryGetValue("beaten_to_goal", out var beatVal))
                 {
-                    session.RegionHandler.RunesRequired = Convert.ToInt32(value);
+                    session.GoalHandler.TreasuresToGoal = Convert.ToInt32(beatVal);
+                }
+                else if (slotData.TryGetValue("treasures_to_goal", out var treVal))
+                {
+                    session.GoalHandler.TreasuresToGoal = Convert.ToInt32(treVal);
+                }
+
+                if (slotData.TryGetValue("runes_required", out var runeVal))
+                {
+                    session.RegionHandler.RunesRequired = Convert.ToInt32(runeVal);
                 }
                 else
                 {
                     session.RegionHandler.RunesRequired = 1;
                 }
+
+                if (slotData.TryGetValue("hint_shop_cost", out var hintCost))
+                {
+                    session.HintHandler.HintCostPercentage = Convert.ToDouble(hintCost);
+                }
+                else
+                {
+                    session.HintHandler.HintCostPercentage = 20;
+                }
+
+
 
                 session.RegionHandler.CreateRegions(slotData);
 
@@ -102,7 +177,7 @@ namespace BEx.Web.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Session creation failed: {ex.Message}");
+                Console.WriteLine($"{player}'s session creation failed: {ex.Message}");
                 return null;
             }
         }
@@ -113,5 +188,10 @@ namespace BEx.Web.Services
         public GameSession Session { get; set; } = default!;
         public DateTime LastSeen { get; set; } = DateTime.UtcNow;
         public List<Notification> RecentLocationsSent { get; } = new();
+
+        public void SetSessionActivity()
+        {
+            LastSeen = DateTime.UtcNow;
+        }
     }
 }

@@ -70,12 +70,19 @@ h1:focus {
     }
 
     .button:active {
-        background: #ddd;
+        background: #c7e0ff;
+        transform: scale(0.99);
     }
 
     .button:disabled {
         background: #ddd;
         border: 1px solid #ccc
+    }
+
+    .button.connecting {
+        background: #c7e0ff;
+        border: 1px solid #7bafd4;
+        cursor: not-allowed;
     }
 
 .button-small {
@@ -133,9 +140,16 @@ h1:focus {
     text-decoration-thickness: 2px;
 }
 
+.login-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 40px;
+}
+
 .login-container {
     max-width: 350px;
-    margin: 40px auto;
+    width: 100%;
     padding: 20px;
     display: flex;
     flex-direction: column;
@@ -145,9 +159,17 @@ h1:focus {
     border: 1px solid #c7e0ff;
 }
 
-.form-group {
-    display: flex;
-    flex-direction: column;
+.login-error {
+    margin-top: 10px;
+    max-width: 350px;
+    text-align: center;
+    padding: 10px 15px;
+    background: #ffe6e6;
+    border: 1px solid #ffb3b3;
+    border-radius: 8px;
+    color: #b00020;
+    font-weight: 500;
+}
 }
 
 .form-control {
@@ -174,6 +196,11 @@ h1:focus {
 .text {
     display: flex;
     flex-direction: column;
+}
+
+.location-checked {
+    opacity: 0.5; /* optional */
+    font-style: italic;
 }
 
 .location-name {
@@ -252,6 +279,32 @@ h2 {
     margin: 0;
 }
 
+.popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.popup-container {
+    background: white;
+    padding: 24px;
+    border-radius: 12px;
+    text-align: center;
+    width: fit-content;
+    max-width: 90vw;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+}
+
+.popup-image {
+    max-width: 250px;
+    display: block;
+    margin: 20px auto;
+}
+
 .notification-container {
     position: fixed;
     top: 20px;
@@ -277,7 +330,7 @@ h2 {
     gap: 8px; /* space between dot and message */
 
     width: auto;
-    max-width: 1000px; /* optional limit so super long messages don’t explode layout */
+    max-width: 1000px; /* optional limit so super long messages donï¿½t explode layout */
     text-align: right; /* optional, keeps the text neat on the right side */
 
     opacity: 1;
