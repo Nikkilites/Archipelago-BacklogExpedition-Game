@@ -238,7 +238,7 @@ else
                                     <div class="location-name">@location.Name</div>
 
                                     @{
-                                        var hint = hints.FirstOrDefault(h => h.LocationId == location.Id);
+                                        var hint = hints.Where(h => h.FindingPlayer == CurrentSession.ConnectionHandler.GetThisSlotId()).FirstOrDefault(h => h.LocationId == location.Id);
                                     }
 
                                     @if (hint != null && !location.IsChecked)
