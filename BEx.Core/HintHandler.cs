@@ -31,7 +31,7 @@ namespace BEx.Core
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Hint refresh failed: {ex}");
+                _gameSession.Logger.Log($"Hint refresh failed: {ex}");
             }
             finally
             {
